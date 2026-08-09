@@ -53,4 +53,4 @@ For issues with the BitcoinTX application, visit:
 https://github.com/BitcoinTX-org/BTCTX-org/issues
 
 For issues with the StartOS wrapper, visit:
-https://github.com/PlebRick/BTCTX-StartOS/issues
+https://github.com/DigiMonk73/BTCTX-StartOS/issues

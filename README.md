@@ -24,7 +24,7 @@ curl -sSL https://start9labs.github.io/start-cli | sh
 ### Build
 
 ```bash
-git clone https://github.com/PlebRick/BTCTX-StartOS.git
+git clone https://github.com/DigiMonk73/BTCTX-StartOS.git
 cd BTCTX-StartOS
 make
 ```

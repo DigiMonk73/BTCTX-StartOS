@@ -7,7 +7,7 @@ export const manifest = setupManifest({
   id: 'btctx',
   title: 'BitcoinTX',
   license: 'mit',
-  packageRepo: 'https://github.com/PlebRick/BTCTX-StartOS',
+  packageRepo: 'https://github.com/DigiMonk73/BTCTX-StartOS',
   upstreamRepo: 'https://github.com/BitcoinTX-org/BTCTX-org',
   marketingUrl: 'https://github.com/BitcoinTX-org/BTCTX-org',
   donationUrl: null,

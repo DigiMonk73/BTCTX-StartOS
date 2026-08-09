@@ -108,7 +108,7 @@ The upstream app uses `/data/btctx.db`. This is configured in:
 ## Git Remotes & Releases
 
 This repo is pushed to two remotes:
-- **origin** → `https://github.com/PlebRick/BTCTX-StartOS.git`
+- **origin** → `https://github.com/DigiMonk73/BTCTX-StartOS.git`
 - **org** → `https://github.com/BitcoinTX-org/BTCTX-StartOS.git`
 
 When pushing changes, always sync both:
@@ -139,7 +139,7 @@ re-run it (`gh run rerun <run-id> --repo <repo>`) or use the workflow's
 Verify afterwards that both releases exist with the asset attached:
 
 ```bash
-gh release view <tag> --repo PlebRick/BTCTX-StartOS --json name,assets
+gh release view <tag> --repo DigiMonk73/BTCTX-StartOS --json name,assets
 gh release view <tag> --repo BitcoinTX-org/BTCTX-StartOS --json name,assets
 ```
 
