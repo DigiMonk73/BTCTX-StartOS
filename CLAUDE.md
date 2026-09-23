@@ -6,9 +6,19 @@ StartOS wrapper for BitcoinTX, a self-hosted Bitcoin portfolio tracker with doub
 
 ## Build Commands
 
+Built with **start-sdk 2.0.9** and **start-cli 2.1.0**; packages require
+**StartOS 0.4.0-beta.10 or later**. The Makefile includes the SDK's own
+`s9pk.mk` (never vendor a copy), and `tsconfig.json` extends the SDK's base.
+To move to a newer SDK: bump `@start9labs/start-sdk`, read its CHANGELOG.md
+(in node_modules) for breaking changes, bump `START_CLI_VERSION` in
+`.github/workflows/release.yml` to the matching start-cli, and bump the
+wrapper revision.
+
 ```bash
-# Build the s9pk package (requires start-cli)
-export PATH="$HOME/.cargo/bin:$PATH" && make
+# Build btctx.s9pk with both architectures (what releases publish)
+make universal
+# or one s9pk per architecture
+make
 
 # TypeScript type checking
 npm run check
@@ -20,7 +30,8 @@ npm run prettier
 make clean
 ```
 
-**Important:** `start-cli` is installed in `~/.cargo/bin/` which may not be in PATH by default. Always prepend the PATH when running make commands.
+Releases: push a `release/vX.Y.Z` branch (or a `v*` tag); `.github/workflows/release.yml`
+builds `btctx.s9pk` with start-cli and publishes the GitHub release.
 
 ## Project Structure
 
@@ -93,7 +104,7 @@ When updating for a new upstream release:
 2. Create new version file in `startos/versions/v*_*_*_*.ts` with the new `version` and `releaseNotes`
 3. Update `startos/versions/index.ts` to set new version as current (previous current moves to `other`)
 4. Run `npm run check` to verify TypeScript
-5. Build with `make`
+5. Build with `make universal`
 
 Note: Since start-sdk 1.x, the version, release notes, and migration ranges
 (`canMigrateTo`/`canMigrateFrom`) are derived from the versions graph — they

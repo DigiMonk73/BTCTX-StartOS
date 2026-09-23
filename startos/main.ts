@@ -11,7 +11,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   /**
    * Create the subcontainer for BitcoinTX
    */
-  const subcontainer = await sdk.SubContainer.of(
+  const subcontainer = sdk.SubContainer.of(
     effects,
     { imageId: 'main' },
     mainMounts(),

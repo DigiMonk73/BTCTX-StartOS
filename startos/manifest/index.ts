@@ -24,15 +24,6 @@ export const manifest = setupManifest({
       arch: ['aarch64', 'x86_64'],
     },
   },
-  alerts: {
-    install:
-      'A unique admin password is generated for this install. Run the "Show Credentials" action to retrieve your login credentials.',
-    update: null,
-    uninstall: null,
-    restore: null,
-    start: null,
-    stop: null,
-  },
   dependencies: {},
   hardwareRequirements: {},
 })

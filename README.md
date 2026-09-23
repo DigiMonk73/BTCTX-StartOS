@@ -11,22 +11,19 @@ This repository contains the StartOS wrapper for [BitcoinTX (with MCP)](https://
 
 ### Prerequisites
 
-- [start-cli](https://github.com/Start9Labs/start-os) 0.4.0+
-- Node.js 18+
+- [start-cli](https://github.com/Start9Labs/start-technologies/releases) 2.1.0+
+- Node.js 22+, git, jq
 - Docker
 
-Install start-cli:
-
-```bash
-curl -sSL https://start9labs.github.io/start-cli | sh
-```
+The package is built with start-sdk 2.0.9 and needs StartOS 0.4.0-beta.10 or later.
 
 ### Build
 
 ```bash
 git clone https://github.com/DigiMonk73/BTCTX-StartOS.git
 cd BTCTX-StartOS
-make
+npm ci
+make universal
 ```
 
 This produces `btctx.s9pk`, which can be sideloaded to StartOS.
@@ -34,7 +31,8 @@ This produces `btctx.s9pk`, which can be sideloaded to StartOS.
 ### Development Commands
 
 ```bash
-make              # Build the s9pk package
+make universal    # Build btctx.s9pk (both architectures)
+make              # Build one s9pk per architecture
 make clean        # Remove build artifacts
 npm run check     # Run TypeScript type checking
 npm run prettier  # Format code
