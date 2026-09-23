@@ -18,8 +18,10 @@ jobs:
         id: compare
         run: |
           PINNED=$(grep -rho "dockerTag: '[^']*'" startos | head -1 | cut -d"'" -f2 | cut -d: -f2)
-          LATEST=$(curl -s "https://hub.docker.com/v2/repositories/b1ackswan/btctx/tags?page_size=50" \
-            | jq -r '.results[].name' \
+          # Image published by DigiMonk73/BTCTX-MCP (.github/workflows/image.yml)
+          TOKEN=$(curl -s "https://ghcr.io/token?scope=repository:digimonk73/btctx-mcp:pull" | jq -r .token)
+          LATEST=$(curl -s -H "Authorization: Bearer $TOKEN" "https://ghcr.io/v2/digimonk73/btctx-mcp/tags/list?n=1000" \
+            | jq -r '.tags[]' \
             | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
             | sort -V \
             | tail -1)
@@ -50,4 +52,4 @@ jobs:
             echo "Issue #$EXISTING already tracks $LATEST"
             exit 0
           fi
-          gh issue create --title "$TITLE" --body "$(printf 'Docker Hub has a newer BitcoinTX release.\n\n- Pinned in manifest: `%s`\n- Latest upstream tag: `%s`\n\nTo update, follow the version bumping checklist in CLAUDE.md.' "$PINNED" "$LATEST")"
+          gh issue create --title "$TITLE" --body "$(printf 'ghcr.io/digimonk73/btctx-mcp has a newer BitcoinTX release.\n\n- Pinned in manifest: `%s`\n- Latest upstream tag: `%s`\n\nTo update, follow the version bumping checklist in CLAUDE.md.' "$PINNED" "$LATEST")"

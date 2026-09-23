@@ -1,6 +1,6 @@
 # BitcoinTX for StartOS
 
-This repository contains the StartOS wrapper for [BitcoinTX](https://github.com/BitcoinTX-org/BTCTX-org), a self-hosted Bitcoin portfolio tracker with double-entry accounting and FIFO cost-basis tax reporting.
+This repository contains the StartOS wrapper for [BitcoinTX (with MCP)](https://github.com/DigiMonk73/BTCTX-MCP), a self-hosted Bitcoin portfolio tracker with double-entry accounting and FIFO cost-basis tax reporting.
 
 ## Requirements
 
@@ -69,7 +69,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- [BitcoinTX Repository](https://github.com/BitcoinTX-org/BTCTX-org)
+- [BitcoinTX (with MCP) repository](https://github.com/DigiMonk73/BTCTX-MCP)
 - [StartOS Documentation](https://docs.start9.com)
 - [StartOS 0.4.0 Packaging Guide](https://staging.docs.start9.com/packaging-guide/index.html)
 - [Start9 Labs](https://start9.com)
