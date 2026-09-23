@@ -1,85 +1,66 @@
+# Runs in DigiMonk73/BTCTX-StartOS (the mirror of BTCTX-MCP's startos/), so the
+# package can be built on its own, e.g. by Start9 after forking it. Releases
+# are normally built by BTCTX-MCP's release workflow; this one runs only when
+# asked: push a branch release/v<upstream>_<revision> or run it from the
+# Actions tab. Inert inside BTCTX-MCP.
 name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
-    branches:
-      - 'release/*'
+    branches: ['release/*']
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to release (e.g. v0.6.0-beta); created at the dispatched commit if it does not exist'
-        required: true
 
 permissions:
   contents: write
-
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      # start-cli matching start-sdk 2.0.x (Start9Labs/start-technologies releases)
       START_CLI_VERSION: v2.1.0
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install squashfs tools
-        run: sudo apt-get update && sudo apt-get install -y squashfs-tools squashfs-tools-ng
-
-      - name: Enable docker containerd image store
+      - name: Tools (squashfs, start-cli, containerd image store for multi-arch)
         run: |
-          sudo mkdir -p /etc/docker
-          if [ -f /etc/docker/daemon.json ]; then
-            sudo jq '. + {"features": {"containerd-snapshotter": true}}' /etc/docker/daemon.json > /tmp/daemon.json
-          else
-            echo '{"features":{"containerd-snapshotter":true}}' > /tmp/daemon.json
-          fi
-          sudo cp /tmp/daemon.json /etc/docker/daemon.json
-          sudo systemctl restart docker
-
-      - name: Install start-cli
-        run: |
-          curl -sSL -o /usr/local/bin/start-cli \
+          sudo apt-get update -q && sudo apt-get install -y -q squashfs-tools squashfs-tools-ng
+          sudo curl -sSL -o /usr/local/bin/start-cli \
             "https://github.com/Start9Labs/start-technologies/releases/download/start-cli%2F${START_CLI_VERSION}/start-cli_x86_64-linux"
-          chmod +x /usr/local/bin/start-cli
-          start-cli --version
-
-      - name: Pull upstream image (all architectures)
+          sudo chmod +x /usr/local/bin/start-cli && start-cli --version
+          echo '{"features":{"containerd-snapshotter":true}}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+      - name: Build the bundle and read the pinned image
+        id: m
         run: |
-          IMAGE=$(grep -rho "dockerTag: '[^']*'" startos | head -1 | cut -d"'" -f2)
-          echo "Pinned image: $IMAGE"
-          docker pull --platform linux/amd64 "$IMAGE"
-          docker pull --platform linux/arm64 "$IMAGE"
-
-      - name: Build s9pk
+          npm ci
+          npm run build
+          node --no-deprecation scripts/check-manifest.mjs
+          echo "image=$(node -p "require('./javascript/index.js').manifest.images.main.source.dockerTag" 2>/dev/null)" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./javascript/index.js').manifest.version" 2>/dev/null)" >> "$GITHUB_OUTPUT"
+      - name: Pull the image (both architectures)
         run: |
-          npm ci   # the Makefile includes node_modules/@start9labs/start-sdk/s9pk.mk
-          # start-cli 2.x packs only inside a packaging workspace (the parent
-          # directory); init-workspace also creates the signing key
-          # (.startos/build.key.pem)
-          start-cli s9pk init-workspace ..
+          docker pull --platform linux/amd64 "${{ steps.m.outputs.image }}"
+          docker pull --platform linux/arm64 "${{ steps.m.outputs.image }}"
+      - name: Signing key (DEV_KEY, else a throwaway key)
+        env:
+          DEV_KEY: ${{ secrets.DEV_KEY }}
+        run: scripts/signing-key.sh "$GITHUB_WORKSPACE/.."
+      - name: Pack
+        run: |
           make universal
-
-      - name: Create release
+          start-cli s9pk inspect btctx.s9pk manifest | jq '{id, version, gitHash}'
+      - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.m.outputs.version }}
         run: |
-          if [ -n "${{ github.event.inputs.tag }}" ]; then
-            TAG="${{ github.event.inputs.tag }}"
+          TAG="v${VERSION/:/_}"
+          NOTES=$(node -p "require('./javascript/index.js').manifest.releaseNotes.en_US" 2>/dev/null)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" btctx.s9pk --clobber
           else
-            TAG="${GITHUB_REF_NAME#release/}"
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --notes "$NOTES" btctx.s9pk
           fi
-          VERSION=$(node -p "require('./javascript/index.js').manifest.version")
-          NOTES=$(node -p "require('./javascript/index.js').manifest.releaseNotes")
-          gh release create "$TAG" --target "$GITHUB_SHA" \
-            --title "v${VERSION}" --notes "$NOTES" ./btctx.s9pk

@@ -1,10 +1,4 @@
 import { sdk } from './sdk'
 
-/**
- * ======================== Dependencies ========================
- *
- * BitcoinTX has no dependencies on other StartOS services.
- */
-export const setDependencies = sdk.setupDependencies(
-  async ({ effects }) => ({}),
-)
+/** BitcoinTX depends on no other StartOS service. */
+export const setDependencies = sdk.setupDependencies(async () => ({}))

@@ -1,39 +1,25 @@
+# Runs in DigiMonk73/BTCTX-StartOS (the mirror of BTCTX-MCP's startos/).
+# Inert inside BTCTX-MCP, where .github/workflows/ci.yml runs the same checks.
 name: CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-
-      - name: Check formatting
-        run: npx prettier --check startos
-
-      - name: Type check
-        run: npm run check
-
-      - name: Build bundle
-        run: npm run build
-
-      - name: Verify packaged manifest
-        run: |
-          node -e "
-            const m = require('./javascript/index.js').manifest
-            if (!m.version || !m.releaseNotes) throw new Error('manifest missing version metadata')
-            console.log('manifest ok:', m.id, m.version)
-          "
+      - run: npx prettier --check startos
+      - run: npm run check
+      - run: npm run lint
+      - run: npm run build
+      - run: node --no-deprecation scripts/check-manifest.mjs

@@ -1,10 +1,11 @@
 import { sdk } from '../sdk'
+import { connectAi } from './connectAi'
+import { recalculateLedger } from './recalculateLedger'
 import { resetCredentials } from './resetCredentials'
 import { showCredentials } from './showCredentials'
 
-/**
- * Here we list every Action.
- */
 export const actions = sdk.Actions.of()
   .addAction(showCredentials)
+  .addAction(connectAi)
+  .addAction(recalculateLedger)
   .addAction(resetCredentials)

@@ -1,10 +1,10 @@
 import { sdk } from './sdk'
 
 /**
- * Here we define which volumes to back up.
- *
- * BitcoinTX stores its SQLite database in the "main" volume at /data.
+ * StartOS stops the service before a backup, so the SQLite file is copied at
+ * rest. `main` holds the database, its session key and the app's own
+ * pre-upgrade copies (backups/); `startos` holds store.json.
  */
-export const { createBackup, restoreInit } = sdk.setupBackups(
-  async ({ effects }) => sdk.Backups.ofVolumes('main'),
+export const { createBackup, restoreInit } = sdk.setupBackups(async () =>
+  sdk.Backups.ofVolumes('main', 'startos'),
 )

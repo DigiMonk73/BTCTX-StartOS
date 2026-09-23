@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>BitcoinTX</title>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbe7a1"/>
+      <stop offset="0.45" stop-color="#e2b04a"/>
+      <stop offset="1" stop-color="#9c6b1c"/>
+    </linearGradient>
+    <linearGradient id="goldEdge" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#fbe7a1"/>
+      <stop offset="0.5" stop-color="#c8923a"/>
+      <stop offset="1" stop-color="#7a5212"/>
+    </linearGradient>
+    <linearGradient id="glyph" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff1bf"/>
+      <stop offset="0.5" stop-color="#e8b95a"/>
+      <stop offset="1" stop-color="#b07a24"/>
+    </linearGradient>
+    <radialGradient id="face" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#27477f"/>
+      <stop offset="1" stop-color="#0a1a38"/>
+    </radialGradient>
+  </defs>
+
+  <!-- coin -->
+  <circle cx="256" cy="256" r="248" fill="url(#gold)"/>
+  <circle cx="256" cy="256" r="226" fill="url(#goldEdge)"/>
+  <circle cx="256" cy="256" r="208" fill="url(#face)"/>
+  <circle cx="256" cy="256" r="208" fill="none" stroke="#6b4a12" stroke-width="4"/>
+
+  <!-- bitcoin B -->
+  <g fill="url(#glyph)" stroke="#6b4a12" stroke-width="4" stroke-linejoin="round">
+    <rect x="196" y="104" width="24" height="44" rx="3"/>
+    <rect x="240" y="104" width="24" height="44" rx="3"/>
+    <rect x="196" y="364" width="24" height="44" rx="3"/>
+    <rect x="240" y="364" width="24" height="44" rx="3"/>
+    <path fill-rule="evenodd" d="M158 140H292C336 140 358 166 358 199C358 222 346 238 326 246C354 254 372 277 372 308C372 346 346 372 298 372H158Z
+      M214 182V230H284C302 230 310 219 310 206C310 192 302 182 284 182Z
+      M214 270V330H292C312 330 322 317 322 300C322 283 312 270 292 270Z"/>
+  </g>
+
+  <!-- TX -->
+  <g stroke-linecap="square" stroke-linejoin="miter" fill="none">
+    <g stroke="#0a1a38" stroke-width="30">
+      <path d="M262 322H322M292 322V384"/>
+      <path d="M334 322L384 384M384 322L334 384"/>
+    </g>
+    <g stroke="url(#glyph)" stroke-width="18">
+      <path d="M262 322H322M292 322V384"/>
+      <path d="M334 322L384 384M384 322L334 384"/>
+    </g>
+  </g>
+</svg>

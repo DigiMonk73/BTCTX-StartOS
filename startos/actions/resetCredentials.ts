@@ -1,53 +1,40 @@
+import { storeJson } from '../fileModels/store.json'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { wrapperStore } from '../fileModels/wrapperStore'
 import {
   credentialsResult,
-  generateAdminPassword,
-  setAdminCredentials,
+  generatePassword,
+  setAppCredentials,
 } from '../utils'
 
 export const resetCredentials = sdk.Action.withoutInput(
-  // id
   'reset-credentials',
 
-  // metadata
   async () => ({
-    name: 'Reset Login Credentials',
-    description:
-      'Reset the username to "admin" and generate a new random password. Use this if you are locked out of your account.',
-    warning:
-      'This will replace your current login credentials. The new password will be displayed once and can be viewed again with the Show Credentials action.',
+    name: i18n('Reset Login Credentials'),
+    description: i18n(
+      'Set the username back to "admin" and generate a new random password. Use this if you are locked out.',
+    ),
+    warning: i18n(
+      'This replaces your current username and password. Your transactions are not touched.',
+    ),
     allowedStatuses: 'only-stopped',
     group: null,
     visibility: 'enabled',
   }),
 
-  // the execution function
   async ({ effects }) => {
-    const password = generateAdminPassword()
-    const previous = await wrapperStore.read().once()
-
-    try {
-      await wrapperStore.write(effects, { adminPassword: password })
-      await setAdminCredentials(effects, password)
-    } catch (error) {
-      // Keep the stored password consistent with the database
-      await wrapperStore
-        .write(effects, previous ?? {})
-        .catch((e) => console.error('Failed to restore wrapper store:', e))
-      return {
-        version: '1',
-        title: 'Reset Failed',
-        message: `Failed to reset credentials: ${error instanceof Error ? error.message : String(error)}`,
-        result: null,
-      }
-    }
+    const password = generatePassword()
+    // The app first, so the store never shows a password that doesn't work.
+    await setAppCredentials(effects, password)
+    await storeJson.merge(effects, { adminPassword: password })
 
     return {
       version: '1',
-      title: 'Credentials Reset',
-      message:
-        'Your login credentials have been reset. Use the credentials below to log in.',
+      title: i18n('Credentials Reset'),
+      message: i18n(
+        'Log in to BitcoinTX with these. Show Credentials displays them again later.',
+      ),
       result: credentialsResult(password),
     }
   },

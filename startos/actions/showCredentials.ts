@@ -1,33 +1,33 @@
+import { storeJson } from '../fileModels/store.json'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { wrapperStore } from '../fileModels/wrapperStore'
 import { credentialsResult } from '../utils'
 
 export const showCredentials = sdk.Action.withoutInput(
-  // id
   'show-credentials',
 
-  // metadata
   async () => ({
-    name: 'Show Credentials',
-    description:
-      'Display the username and password for logging into BitcoinTX.',
+    name: i18n('Show Credentials'),
+    description: i18n('The username and password for logging in to BitcoinTX.'),
     warning: null,
     allowedStatuses: 'any',
     group: null,
     visibility: 'enabled',
   }),
 
-  // the execution function
-  async ({ effects }) => {
-    const stored = await wrapperStore.read().once()
-    const password = stored?.adminPassword
+  async () => {
+    const password = await storeJson.read((s) => s.adminPassword).once()
 
     return {
       version: '1',
-      title: 'Login Credentials',
+      title: i18n('Login Credentials'),
       message: password
-        ? 'Use these credentials to log in to BitcoinTX.'
-        : 'This install predates generated credentials, so the upstream defaults are shown. If you have changed your password in the app, use that instead. You should change the default password after logging in.',
+        ? i18n(
+            'Log in to BitcoinTX with these. If you changed the password inside BitcoinTX, use that one instead; run Reset Login Credentials if you have lost it.',
+          )
+        : i18n(
+            'This install predates generated passwords, so the original default login is shown. If you changed it inside BitcoinTX, use yours; run Reset Login Credentials if you have lost it.',
+          ),
       result: credentialsResult(password ?? 'password'),
     }
   },

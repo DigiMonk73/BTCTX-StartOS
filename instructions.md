@@ -1,80 +1,49 @@
-# BitcoinTX Instructions
+# BitcoinTX
 
-## Getting Started
+## Documentation
 
-After installation, click the "Launch UI" button to open the BitcoinTX web interface.
+- [BitcoinTX README](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/README.md) — what the app does: transactions, FIFO lots, Form 8949 and Schedule D, imports.
+- [BitcoinTX MCP server](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md) — connecting an AI assistant: the tools it gets and how to configure it.
 
-## Logging In
+## What you get on StartOS
 
-A unique admin password is generated when the service is installed. To retrieve your credentials, run the **Show Credentials** action from the service's Actions menu.
+- **Web UI**: the BitcoinTX app, behind your login.
+- **MCP API**: the address an AI assistant (Claude Desktop, Claude Code or any MCP client) uses to read and add transactions for you. It is the same server and the same login as the web UI.
+- **A generated login**: a random password replaces the app's default one at install.
+- **Backups**: your database, your login and BitcoinTX's own safety copies of the database are in every StartOS backup.
 
-If you are ever locked out, stop the service and run the **Reset Login Credentials** action to generate a new password.
+## Getting set up
 
-## Features
+1. Run **Show Credentials** when prompted and keep the username and password somewhere safe.
+2. Start the service and open the **Web UI**. Log in with those credentials.
+3. In **Settings**, check the **Tax Timezone**: it decides which tax year a transaction late on December 31 belongs to.
+4. Add your transactions by hand, import a River or generic CSV, or connect an AI assistant (below).
 
-### Portfolio Tracking
+You can change the username and password inside BitcoinTX (**Settings > Reset Username & Password**). Show Credentials keeps showing the generated password, so use yours after changing it.
 
-BitcoinTX tracks your Bitcoin holdings using double-entry accounting principles. Each transaction is recorded with proper debits and credits to maintain an accurate ledger.
+## Using BitcoinTX
 
-### Adding Transactions
+### Web interface
 
-Use the web interface to add:
+Record deposits, withdrawals, transfers, buys and sells. Every change recalculates the whole ledger, so backdated entries come out right. **Reports** produces Form 8949 and Schedule D as filled PDFs, a complete tax report and your transaction history. For 2025 and later, sales go into the Form 1099-DA boxes; if the 1099-DA your exchange sends shows something different for a sale, set **Broker form** on that transaction.
 
-- Purchases (fiat to Bitcoin)
-- Sales (Bitcoin to fiat)
-- Transfers between wallets
-- Income received in Bitcoin
-- Fees and expenses
+### Connecting an AI assistant
 
-### Cost Basis Calculation
+1. Run **Connect an AI Assistant**. It shows the MCP address, your login, the certificate your computer needs to trust this server, and a ready-to-paste configuration.
+2. On the computer with your AI client, install [uv](https://docs.astral.sh/uv/).
+3. Save the certificate as a file (the action tells you the name) and put its full path in `BTCTX_CA_BUNDLE`.
+4. Paste the **Claude Desktop configuration** into Claude Desktop (**Settings > Developer > Edit Config**) and restart it, or run the **Claude Code command** in a terminal.
+5. Ask the assistant to add a transaction, for example by pasting an exchange confirmation email. It shows you a preview and saves only after you confirm.
 
-BitcoinTX uses FIFO (First In, First Out) accounting to calculate your cost basis. This method assigns the cost of your earliest purchases to your sales first.
+The configuration holds your password: anyone who can read it can log in to BitcoinTX.
 
-### Tax Reports
+### Actions
 
-Generate IRS-compliant tax documents:
+- **Show Credentials**: the username and the generated password.
+- **Connect an AI Assistant**: everything an AI client needs, as above.
+- **Recalculate Ledger**: rebuilds every lot and gain from your transactions, like **Settings > Recalculate Ledger** in the app. You are asked to run it once after updates that change how gains are calculated; your transactions are not changed.
+- **Reset Login Credentials**: if you are locked out, sets the username back to `admin` with a new random password. Your transactions are not touched.
 
-- **Form 8949**: Sales and Other Dispositions of Capital Assets
-- **Schedule D**: Capital Gains and Losses
+## Limitations
 
-Export reports for your tax year to include with your filing. Sales are placed
-in the Form 1099-DA boxes for 2025 and later. If the 1099-DA your exchange
-sends shows something different for a sale, set "Broker form" on that
-transaction.
-
-Set your **Tax Timezone** in Settings: it decides which tax year a late-night
-December 31 transaction belongs to.
-
-### Adding Transactions with an AI (MCP)
-
-BitcoinTX includes an MCP server, so an AI assistant (Claude Desktop, Claude
-Code, or any MCP client) can add transactions from pasted exchange emails,
-wallet history, or plain English, with a preview before anything is saved.
-It runs on your computer and connects to this service's LAN address
-(`https://….local`). Setup, including how to trust your server's certificate:
-https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md
-
-## Data Storage
-
-All data is stored locally in a SQLite database. Your financial information never leaves your server.
-
-## Backups
-
-BitcoinTX data is included in StartOS backups. Regular backups are recommended to protect your transaction history.
-
-When an update changes the database, BitcoinTX first saves a copy of it in a
-`backups` folder on the service's volume, so an update can always be undone.
-
-## Updating to 0.8.0
-
-The database upgrades itself on first start. Afterwards, open **Settings** and
-click **Recalculate Ledger** once: this release corrects how transfer fees,
-sale proceeds and the one-year holding period are calculated.
-
-## Support
-
-For issues with the BitcoinTX application, visit:
-https://github.com/DigiMonk73/BTCTX-MCP/issues
-
-For issues with the StartOS wrapper, visit:
-https://github.com/DigiMonk73/BTCTX-StartOS/issues
+- **BitcoinTX cannot be downgraded.** Each update may upgrade the database, and older versions refuse a newer database. BitcoinTX keeps copies of the database from before its last few upgrades in its `backups` folder; to go back, restore a StartOS backup.

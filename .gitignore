@@ -3,7 +3,6 @@ startos/*.js
 node_modules/
 .DS_Store
 .vscode/
-.claude/
 docker-images
 javascript
 ncc-cache

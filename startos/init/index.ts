@@ -1,22 +1,26 @@
-import { sdk } from '../sdk'
+import { actions } from '../actions'
+import { restoreInit } from '../backups'
 import { setDependencies } from '../dependencies'
 import { setInterfaces } from '../interfaces'
-import { versions } from '../versions'
-import { restoreInit } from '../backups'
-import { actions } from '../actions'
-import { firstBoot } from './firstBoot'
+import { sdk } from '../sdk'
+import { versionGraph } from '../versions'
+import { installCredentials } from './installCredentials'
+import { recalculateTask } from './recalculateTask'
+import { seedStore } from './seedStore'
 
 /**
- * This sets up what happens when the service initializes and uninitializes.
- * Scripts run in the order they are listed.
+ * Runs in this order on install, update, restore and container rebuild.
+ * Handlers that raise tasks come after `actions`.
  */
 export const init = sdk.setupInit(
   restoreInit,
-  versions,
-  firstBoot,
-  setDependencies,
+  versionGraph,
+  seedStore,
   setInterfaces,
+  setDependencies,
   actions,
+  installCredentials,
+  recalculateTask,
 )
 
-export const uninit = sdk.setupUninit(versions)
+export const uninit = sdk.setupUninit(versionGraph)
