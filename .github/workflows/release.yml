@@ -15,6 +15,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -59,6 +63,7 @@ jobs:
 
       - name: Build s9pk
         run: |
+          npm ci   # the Makefile includes node_modules/@start9labs/start-sdk/s9pk.mk
           start-cli init-key
           make universal
 
