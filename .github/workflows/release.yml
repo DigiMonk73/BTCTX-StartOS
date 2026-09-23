@@ -64,7 +64,10 @@ jobs:
       - name: Build s9pk
         run: |
           npm ci   # the Makefile includes node_modules/@start9labs/start-sdk/s9pk.mk
-          start-cli init-key
+          # start-cli 2.x packs only inside a packaging workspace (the parent
+          # directory); init-workspace also creates the signing key
+          # (.startos/build.key.pem)
+          start-cli s9pk init-workspace ..
           make universal
 
       - name: Create release
