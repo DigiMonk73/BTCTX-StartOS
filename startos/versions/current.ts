@@ -1,36 +1,17 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
-import { rm } from 'fs/promises'
-import {
-  LEGACY_WRAPPER_STORE,
-  legacyWrapperStore,
-} from '../fileModels/legacyWrapperStore'
-import { storeJson } from '../fileModels/store.json'
-import { sdk } from '../sdk'
 
 export const current = VersionInfo.of({
-  version: '0.9.0:0',
+  version: '0.9.1:0',
   releaseNotes: {
-    en_US: `BitcoinTX 0.9.0.
+    en_US: `BitcoinTX 0.9.1.
 
-- New action "Connect an AI Assistant": the address, login and certificate your AI client needs, with a ready-to-paste Claude Desktop config and Claude Code command.
-- New action "Recalculate Ledger".
-- The MCP address is listed under Interfaces as "MCP API".
-- Startup runs the database upgrade as its own step, and the health check confirms the database is ready, not just that the page loads.
-- Quieter logs (INFO instead of DEBUG).
-- Only the newest 5 automatic database copies are kept in the backups folder.
-- Your generated login moved out of the app's volume into package storage.
-- Downgrading to an earlier version is no longer offered: it would start an older BitcoinTX on a database it cannot read. Restore a backup instead.`,
+- Settings has a new "Connect an AI Assistant" section: a setup prompt to paste into your AI app, filled in with this server's address and your username, plus ready-made Claude Desktop and Claude Code configurations. Your password is never shown in it.
+- River import: sales no longer subtract River's fee twice. Sales imported before this update keep the old proceeds; set each one's proceeds to River's Received Amount plus the fee.
+- Editing a transaction no longer moves its time by your timezone's offset, and keeps the seconds. A new transaction's default time is now your local time.
+- Income, Interest and Reward deposits entered without a cost basis are valued at that day's BTC price instead of $0, so they count as income. Opening and saving one that was saved at $0 fixes it.`,
   },
   migrations: {
-    up: async ({ effects }) => {
-      // 0.8.0:1 and older kept the generated password in the app's volume.
-      const legacy = await legacyWrapperStore.read().once()
-      const stored = await storeJson.read((s) => s.adminPassword).once()
-      await storeJson.merge(effects, {
-        adminPassword: stored ?? legacy?.adminPassword,
-      })
-      await rm(sdk.volumes.main.subpath(LEGACY_WRAPPER_STORE), { force: true })
-    },
+    up: async () => {},
     down: IMPOSSIBLE,
   },
 })

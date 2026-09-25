@@ -15,7 +15,17 @@ KEY="$WS/.startos/build.key.pem"
 
 if [ -n "${DEV_KEY:-}" ]; then
   mkdir -p "$WS/.startos"
-  (umask 077 && printf '%s\n' "$DEV_KEY" > "$KEY")
+  # start-cli's PEM parser rejects what openssl shrugs off, such as a blank
+  # line after the END line (a secret pasted from a file ends with a newline,
+  # and printf adds one) or trailing spaces. Have openssl rewrite the key
+  # canonically; a key openssl can't read (one made by `start-cli init-key`)
+  # gets its trailing whitespace and blank lines dropped instead.
+  (
+    umask 077
+    if ! printf '%s\n' "$DEV_KEY" | openssl pkey -out "$KEY" 2>/dev/null; then
+      printf '%s\n' "$DEV_KEY" | sed -e 's/[[:space:]]*$//' -e '/^$/d' > "$KEY"
+    fi
+  )
   echo "Signing with DEV_KEY"
 else
   start-cli s9pk init-workspace "$WS"
