@@ -18,7 +18,7 @@ export const manifest = setupManifest({
       source: {
         // Must be v<VERSION> of the repository root (checked by
         // backend/tests/test_versions_agree.py); published by image.yml.
-        dockerTag: 'ghcr.io/digimonk73/btctx-mcp:v1.0.0',
+        dockerTag: 'ghcr.io/digimonk73/btctx-mcp:v1.0.1',
       },
       arch: ['x86_64', 'aarch64'],
     },
