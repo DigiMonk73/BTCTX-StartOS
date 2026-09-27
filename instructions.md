@@ -8,7 +8,7 @@
 ## What you get on StartOS
 
 - **Web UI**: the BitcoinTX app, behind your login.
-- **MCP API**: the address an AI assistant (Claude Desktop, Claude Code or any MCP client) uses to read and add transactions for you. It is the same server and the same login as the web UI.
+- **MCP API**: the address an AI assistant (Claude Desktop, Claude Code or any MCP client) uses to read and add transactions for you. It is the same server as the web UI; the AI uses an AI key you create in BitcoinTX, never your password.
 - **A generated login**: a random password replaces the app's default one at install.
 - **Backups**: your database, your login and BitcoinTX's own safety copies of the database are in every StartOS backup.
 
@@ -30,19 +30,22 @@ Record deposits, withdrawals, transfers, buys and sells. Every change recalculat
 
 ### Connecting an AI assistant
 
-AI entry is optional: nothing uses the MCP API until you set up an AI app, which logs in with your BitcoinTX username and password (there is no separate switch; to stop it, remove the server from your AI app or change your password).
+AI entry is optional: nothing uses the MCP API until you turn on AI access and create an AI key in BitcoinTX (**Settings > Connect an AI Assistant**). The key is not your password: it can read your ledger, add or change entries and make a backup, but it can't log in, change your password, restore or delete everything. Turn AI access off or revoke the key there at any time.
 
 **Privacy first:** once connected, the AI's model reads your transactions, balances and gains, and anything you paste. With a cloud AI (Claude, Grok and most others) that data goes to the provider's servers. To keep it private, use an app that runs a local model, such as LM Studio or Goose with Ollama ([setup](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md#privacy-cloud-or-local-model)).
 
-The web UI's **Settings > Connect an AI Assistant** has a setup prompt with this server's address filled in. By hand:
+The web UI's **Settings > Connect an AI Assistant** has the key, a setup prompt with this server's address filled in, and ready-made configurations. By hand:
 
-1. Run **Connect an AI Assistant**. It shows the MCP address, your login, the certificate your computer needs to trust this server, and a ready-to-paste configuration.
-2. On the computer with your AI client, install [uv](https://docs.astral.sh/uv/).
-3. Save the certificate as a file (the action tells you the name) and put its full path in `BTCTX_CA_BUNDLE`.
-4. Paste the **Claude Desktop configuration** into Claude Desktop (**Settings > Developer > Edit Config**) or LM Studio (**Edit mcp.json**) and restart it, or run the **Claude Code command** in a terminal.
-5. Ask the assistant to add a transaction, for example by pasting an exchange confirmation email. It shows you a preview and saves only after you confirm.
+1. In the web UI, **Settings > Connect an AI Assistant**: turn on **Let AI assistants use BitcoinTX** and click **Create AI key**. BitcoinTX shows it once; keep it for step 5.
+2. Run **Connect an AI Assistant**. It shows the MCP address, the certificate your computer needs to trust this server, and a ready-to-paste configuration.
+3. On the computer with your AI client, install [uv](https://docs.astral.sh/uv/).
+4. Save the certificate as a file (the action tells you the name) and put its full path in `BTCTX_CA_BUNDLE`.
+5. Paste the **Claude Desktop configuration** into Claude Desktop (**Settings > Developer > Edit Config**) or LM Studio (**Edit mcp.json**), replace `YOUR_BITCOINTX_AI_KEY` with your key, and restart it. The **Claude Code command** works too, but keeps the key in your shell history.
+6. Ask the assistant to add a transaction, for example by pasting an exchange confirmation email. It shows you a preview and saves only after you confirm.
 
-The configuration holds your password: anyone who can read it can log in to BitcoinTX.
+The configuration holds your AI key: anyone who can read it can do what the key allows until you revoke it in BitcoinTX.
+
+**Set up an AI app before AI keys existed?** Its configuration holds your BitcoinTX password in plain text, and BitcoinTX no longer accepts it for AI access. Create a key (step 1), replace `BTCTX_USERNAME` and `BTCTX_PASSWORD` in that configuration with `BTCTX_AI_KEY`, then run **Reset Login Credentials** (or change your password in BitcoinTX), since the old one sat in that file.
 
 ### Actions
 

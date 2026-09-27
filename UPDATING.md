@@ -7,22 +7,29 @@ Docker image, the macOS app and this package.
 
 ## Releasing a new version
 
-1. On a branch, bump the version everywhere it is written (the tests fail
+Branches (`CLAUDE.md`, "Branches"): work happens on `develop`; `main` holds
+released code only and moves by fast-forwarding to `develop`.
+
+1. On `develop`, bump the version everywhere it is written (the tests fail
    until all agree):
    - `VERSION` and the two `CFBundle…Version` values in `desktop/BitcoinTX.spec`
+   - `version` in `mcp_server/pyproject.toml` (the AI connector)
    - `dockerTag` in `startos/startos/manifest/index.ts`:
      `ghcr.io/digimonk73/btctx-mcp:v<VERSION>`
    - the package version (next section)
 2. Move the `## [Unreleased]` section of `docs/CHANGELOG.md` to
    `## [vX.Y.Z] - <date> - <summary>`.
-3. Merge to `main`. `.github/workflows/image.yml` publishes the image
+3. Push `develop` and wait for CI, then fast-forward `main` to it
+   (`git checkout main && git merge --ff-only develop && git push`).
+   `.github/workflows/image.yml` publishes the image
    `ghcr.io/digimonk73/btctx-mcp:vX.Y.Z`.
-4. Push a branch `release/vX.Y.Z` from that commit. `.github/workflows/release.yml`
+4. Push a branch `release/vX.Y.Z` from that commit on `main` (the release
+   workflow refuses a commit that isn't on `main`). `.github/workflows/release.yml`
    then builds the image (if `main` hasn't yet), the macOS `.dmg` and `.zip`
    and `btctx.s9pk`, creates the tag and one GitHub release with all three,
    and mirrors `startos/` to BTCTX-StartOS (when `MIRROR_TOKEN` exists),
    with a release there too (same `btctx.s9pk`, marked Latest). Nothing to
-   do in the mirror by hand.
+   do in the mirror by hand. Delete the `release/…` branch afterwards.
 
 A package-only fix (no app change) keeps `VERSION` and raises the package
 revision instead (`0.9.0:0` → `0.9.0:1`, next section). Release it the same

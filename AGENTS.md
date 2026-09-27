@@ -5,7 +5,8 @@ start-sdk 2.0.9. It lives in `startos/` of
 [DigiMonk73/BTCTX-MCP](https://github.com/DigiMonk73/BTCTX-MCP) (the app) and
 is mirrored as-is to [DigiMonk73/BTCTX-StartOS](https://github.com/DigiMonk73/BTCTX-StartOS),
 the repository Start9's community registry would fork. **Edit it in
-BTCTX-MCP**; a change made only in the mirror is overwritten by the next sync.
+BTCTX-MCP, on the `develop` branch** (`main` there holds released code
+only); a change made only in the mirror is overwritten by the next sync.
 
 The packaging guide is at <https://docs.start9.com/packaging> (source:
 `Start9Labs/start-technologies`, branch `live-docs`,

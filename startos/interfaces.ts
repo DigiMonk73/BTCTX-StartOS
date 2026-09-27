@@ -31,7 +31,7 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     name: i18n('MCP API'),
     id: mcpInterfaceId,
     description: i18n(
-      'The address for AI assistants (MCP clients), which log in with your BitcoinTX username and password. Optional: nothing uses it until you set up an AI app. Run the Connect an AI Assistant action for a ready-made configuration.',
+      'The address for AI assistants (MCP clients), which use an AI key you create in BitcoinTX Settings, never your password. Optional: nothing uses it until you set up an AI app. Run the Connect an AI Assistant action for a ready-made configuration.',
     ),
     type: 'api',
     masked: false,
