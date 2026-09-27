@@ -24,9 +24,10 @@ the repo instead: no `TODO.md`, `NOTES.md` or `PLAN.md`.
   (documented in `docs/STARTOS_COMPATIBILITY.md`). Credentials, migrations and
   the ledger recalculation go through `python -m backend.cli`; never edit the
   SQLite database from package code.
-- **Ids are frozen:** package `btctx`, host `ui-multi`, interface `webui`,
-  actions `show-credentials` and `reset-credentials`, volume `main`. Existing
-  installs (0.3.x to 0.8.0:1) depend on them.
+- **Ids are frozen:** package `btctx`, host `ui-multi`, interfaces `webui` and
+  `mcp`, actions `show-credentials`, `reset-credentials`, `recalculate-ledger`
+  and `connect-ai`, volumes `main` and `startos`. Existing installs (0.3.x to
+  the current version) depend on them.
 - **Versions:** `startos/versions/current.ts` is `<VERSION>:<revision>`. When
   `VERSION` changes and `current.ts`'s `up` does real work, move it to
   `vX_Y_Z_N.ts` and add it to `other` in `versions/index.ts` before writing

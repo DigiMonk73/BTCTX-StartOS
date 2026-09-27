@@ -17,7 +17,8 @@
 1. Run **Show Credentials** when prompted and keep the username and password somewhere safe.
 2. Start the service and open the **Web UI**. Log in with those credentials.
 3. In **Settings**, check the **Tax Timezone**: it decides which tax year a transaction late on December 31 belongs to.
-4. Add your transactions by hand, import a River or generic CSV, or connect an AI assistant (below).
+4. Optional: in **Settings > Privacy & Network**, point BitcoinTX at your own mempool server (for example the one on this server) or a Tor proxy, or turn live data off.
+5. Add your transactions by hand, import a River CSV or a generic CSV (a generic CSV only into an empty ledger), or connect an AI assistant (below).
 
 You can change the username and password inside BitcoinTX (**Settings > Reset Username & Password**). Show Credentials keeps showing the generated password, so use yours after changing it.
 
@@ -29,10 +30,16 @@ Record deposits, withdrawals, transfers, buys and sells. Every change recalculat
 
 ### Connecting an AI assistant
 
+AI entry is optional: nothing uses the MCP API until you set up an AI app, which logs in with your BitcoinTX username and password (there is no separate switch; to stop it, remove the server from your AI app or change your password).
+
+**Privacy first:** once connected, the AI's model reads your transactions, balances and gains, and anything you paste. With a cloud AI (Claude, Grok and most others) that data goes to the provider's servers. To keep it private, use an app that runs a local model, such as LM Studio or Goose with Ollama ([setup](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md#privacy-cloud-or-local-model)).
+
+The web UI's **Settings > Connect an AI Assistant** has a setup prompt with this server's address filled in. By hand:
+
 1. Run **Connect an AI Assistant**. It shows the MCP address, your login, the certificate your computer needs to trust this server, and a ready-to-paste configuration.
 2. On the computer with your AI client, install [uv](https://docs.astral.sh/uv/).
 3. Save the certificate as a file (the action tells you the name) and put its full path in `BTCTX_CA_BUNDLE`.
-4. Paste the **Claude Desktop configuration** into Claude Desktop (**Settings > Developer > Edit Config**) and restart it, or run the **Claude Code command** in a terminal.
+4. Paste the **Claude Desktop configuration** into Claude Desktop (**Settings > Developer > Edit Config**) or LM Studio (**Edit mcp.json**) and restart it, or run the **Claude Code command** in a terminal.
 5. Ask the assistant to add a transaction, for example by pasting an exchange confirmation email. It shows you a preview and saves only after you confirm.
 
 The configuration holds your password: anyone who can read it can log in to BitcoinTX.
@@ -41,7 +48,7 @@ The configuration holds your password: anyone who can read it can log in to Bitc
 
 - **Show Credentials**: the username and the generated password.
 - **Connect an AI Assistant**: everything an AI client needs, as above.
-- **Recalculate Ledger**: rebuilds every lot and gain from your transactions, like **Settings > Recalculate Ledger** in the app. You are asked to run it once after updates that change how gains are calculated; your transactions are not changed.
+- **Recalculate Ledger**: rebuilds every lot and gain from your transactions, like **Settings > Recalculate Ledger** in the app. Your transactions are not changed. Before running it after an update, open **Settings > Ledger Review** in the app: it lists every figure a recalculation would change.
 - **Reset Login Credentials**: if you are locked out, sets the username back to `admin` with a new random password. Your transactions are not touched.
 
 ## Limitations

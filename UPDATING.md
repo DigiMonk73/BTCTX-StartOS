@@ -45,7 +45,7 @@ its release notes (what StartOS shows before updating) and its migration.
   one has migrated.
 - Release notes are user-facing: what changed for them, in plain language.
 
-Checks: `npm run check && npm run lint && npm run build && node scripts/check-manifest.mjs`
+Checks: `npm run check && npm run lint && npm run build && node scripts/check-manifest.mjs && npx prettier --check startos`
 (also run by the pre-push hook and CI), and `backend/tests/test_versions_agree.py`.
 
 ## Bumping the SDK

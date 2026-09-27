@@ -41,7 +41,7 @@ The image is the app's own published image, pulled rather than built: the same o
 | ------------- | ---------------------------------------------------------------------- |
 | Image         | `ghcr.io/digimonk73/btctx-mcp`, pinned to the package's upstream version |
 | Architectures | x86_64, aarch64                                                        |
-| Command       | `uvicorn backend.main:app --port 80`, after a `migrate` oneshot        |
+| Command       | `uvicorn backend.main:app --host 0.0.0.0 --port 80`, after a `migrate` oneshot |
 | Environment   | `DATABASE_FILE=/data/btctx.db`, `LOG_LEVEL=INFO`                       |
 
 | Subcontainer    | Lifetime            | Purpose                                                                    |
@@ -70,7 +70,7 @@ Installs from 0.8.0:1 and older also had `.startos-wrapper.json` on `main`; the 
 
 ## File Models
 
-One model, `store.json` on the `startos` volume. The package writes no app configuration: BitcoinTX keeps its settings (tax timezone, login) in its own database.
+One model, `store.json` on the `startos` volume. The package writes no app configuration: BitcoinTX keeps its settings (tax timezone, login, privacy & network) in its own database.
 
 | Key                 | Meaning                                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -83,7 +83,7 @@ None.
 
 ## Network Access and Interfaces
 
-One HTTP port with two interfaces. StartOS terminates TLS; the app serves plain HTTP on port 80 inside the container. BitcoinTX makes outbound requests only for BTC prices (CoinGecko, Kraken, CoinDesk).
+One HTTP port with two interfaces. StartOS terminates TLS; the app serves plain HTTP on port 80 inside the container. BitcoinTX makes outbound requests only for the BTC price and block height (CoinGecko, Kraken, CoinDesk, blockchain.info, Blockstream, mempool.space) and for missing past daily prices (Bitstamp, Coinbase, Kraken). In the app's **Settings → Privacy & Network** the owner can turn live data off, use their own mempool server, or route requests through a proxy such as Tor.
 
 | Interface | Id      | Type | Port | Path   | Description                                          |
 | --------- | ------- | ---- | ---- | ------ | ---------------------------------------------------- |
@@ -132,6 +132,8 @@ Two tasks.
 | Recalculate Ledger  | `important` | After updating (or restoring a backup) from before 0.8.0 | The action runs            |
 
 The critical task blocks starting the service until the user has seen the password. The recalculation task does not block: the app works, but gains computed before 0.8.0's fixes (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
+
+Updates from 0.9.1 or earlier to 0.9.2 or later raise no task, but the next recalculation (or any add, edit or delete) changes withdrawal-fee and Lost figures. **Settings → Ledger Review** in the app lists them beforehand.
 
 ## Health Checks
 

@@ -52,7 +52,7 @@ export const connectAi = sdk.Action.withoutInput(
   async () => ({
     name: i18n('Connect an AI Assistant'),
     description: i18n(
-      'Everything an AI assistant such as Claude Desktop or Claude Code needs to add transactions for you: the address, your login, the certificate to trust, and a ready-to-paste configuration.',
+      'Everything an AI assistant such as Claude Desktop, Claude Code or LM Studio needs to add transactions for you: the address, your login, the certificate to trust, and a ready-to-paste configuration.',
     ),
     warning: null,
     allowedStatuses: 'any',
@@ -110,7 +110,7 @@ export const connectAi = sdk.Action.withoutInput(
       title: i18n('Connect an AI Assistant'),
       message: [
         i18n(
-          'The BitcoinTX MCP server runs on the computer with your AI client and needs uv (https://docs.astral.sh/uv/) installed there.',
+          'The BitcoinTX MCP server runs on the computer with your AI client and needs uv (https://docs.astral.sh/uv/) installed there. Privacy: the model behind your AI app reads your transactions, balances and gains. With a cloud AI (Claude, Grok and most others) that goes to the provider; a local model (LM Studio, Goose with Ollama) keeps it on your own computer.',
         ),
         ca
           ? i18n(
@@ -122,7 +122,7 @@ export const connectAi = sdk.Action.withoutInput(
               { file: CA_FILE },
             ),
         i18n(
-          'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config, or run the Claude Code command.',
+          'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config (or mcp.json in LM Studio), or run the Claude Code command.',
         ),
         stored
           ? i18n(

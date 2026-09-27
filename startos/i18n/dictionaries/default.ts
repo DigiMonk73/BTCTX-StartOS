@@ -12,7 +12,7 @@ const dict = {
   'Web UI': 5,
   'The BitcoinTX web interface': 6,
   'MCP API': 7,
-  'The address for AI assistants (MCP clients). Run the Connect an AI Assistant action for a ready-made configuration.': 8,
+  'The address for AI assistants (MCP clients), which log in with your BitcoinTX username and password. Optional: nothing uses it until you set up an AI app. Run the Connect an AI Assistant action for a ready-made configuration.': 8,
 
   // utils.ts
   Username: 9,
@@ -20,16 +20,16 @@ const dict = {
 
   // actions/connectAi.ts
   'Connect an AI Assistant': 11,
-  'Everything an AI assistant such as Claude Desktop or Claude Code needs to add transactions for you: the address, your login, the certificate to trust, and a ready-to-paste configuration.': 12,
+  'Everything an AI assistant such as Claude Desktop, Claude Code or LM Studio needs to add transactions for you: the address, your login, the certificate to trust, and a ready-to-paste configuration.': 12,
   'MCP address (BTCTX_URL)': 13,
   'Other address': 14,
   'Root CA certificate': 15,
   'Claude Desktop configuration': 16,
   'Claude Code command': 17,
-  'The BitcoinTX MCP server runs on the computer with your AI client and needs uv (https://docs.astral.sh/uv/) installed there.': 18,
+  'The BitcoinTX MCP server runs on the computer with your AI client and needs uv (https://docs.astral.sh/uv/) installed there. Privacy: the model behind your AI app reads your transactions, balances and gains. With a cloud AI (Claude, Grok and most others) that goes to the provider; a local model (LM Studio, Goose with Ollama) keeps it on your own computer.': 18,
   'Save the Root CA certificate below as ${file} and put its full path in BTCTX_CA_BUNDLE.': 19,
   'Download your server Root CA (System > About this Server), save it as ${file} and put its full path in BTCTX_CA_BUNDLE.': 20,
-  'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config, or run the Claude Code command.': 21,
+  'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config (or mcp.json in LM Studio), or run the Claude Code command.': 21,
   'If you changed your password inside BitcoinTX, replace it in the configuration.': 22,
   'Replace your-bitcointx-password with the password you log in with.': 23,
 
