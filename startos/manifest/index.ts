@@ -7,7 +7,7 @@ export const manifest = setupManifest({
   license: 'MIT',
   packageRepo: 'https://github.com/DigiMonk73/BTCTX-StartOS',
   upstreamRepo: 'https://github.com/DigiMonk73/BTCTX-MCP',
-  marketingUrl: 'https://github.com/DigiMonk73/BTCTX-MCP',
+  marketingUrl: 'https://digimonk73.github.io/btctx-site/',
   donationUrl: null,
   description: { short, long },
   // main: the app's data at /data. startos: this package's store.json, never

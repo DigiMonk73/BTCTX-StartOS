@@ -66,7 +66,7 @@ Two volumes: the app's data, and this package's own state, which the app never s
 | `.btctx_secret_key`     | Session-cookie signing key, generated on first start (mode 600)                            |
 | `backups/`              | The app's copies of `btctx.db` from before a schema upgrade or an in-app restore; the newest 5 are kept |
 
-Installs from 0.8.0:1 and older also had `.startos-wrapper.json` on `main`; the update moves its password into `store.json` and deletes it.
+Installs from before the separate `startos` volume also had `.startos-wrapper.json` on `main`; the update moves its password into `store.json` and deletes it.
 
 ## File Models
 
@@ -75,7 +75,7 @@ One model, `store.json` on the `startos` volume. The package writes no app confi
 | Key                 | Meaning                                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `adminPassword`     | The password the package generated at install or on Reset Login Credentials. Not updated when the user changes the password inside BitcoinTX. Absent on installs from before generated passwords (they started with `admin` / `password`). |
-| `recalculateLedger` | `true` after an update from a version before 0.8.0, until Recalculate Ledger runs.                             |
+| `recalculateLedger` | `true` after an update from a version with the old gain calculations (transfer fees, sale proceeds, holding period), until Recalculate Ledger runs. |
 
 ## Dependencies
 
@@ -129,11 +129,11 @@ Two tasks.
 | Task                | Severity    | Raised when                                        | Cleared when                     |
 | ------------------- | ----------- | -------------------------------------------------- | -------------------------------- |
 | Show Credentials    | `critical`  | At install, after the password is set              | The action runs                  |
-| Recalculate Ledger  | `important` | After updating (or restoring a backup) from before 0.8.0 | The action runs            |
+| Recalculate Ledger  | `important` | After updating (or restoring a backup) from a version with the old gain calculations | The action runs |
 
-The critical task blocks starting the service until the user has seen the password. The recalculation task does not block: the app works, but gains computed before 0.8.0's fixes (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
+The critical task blocks starting the service until the user has seen the password. The recalculation task does not block: the app works, but gains computed the old way (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
 
-Updates from 0.9.1 or earlier to 0.9.2 or later raise no task, but the next recalculation (or any add, edit or delete) changes withdrawal-fee and Lost figures. **Settings → Ledger Review** in the app lists them beforehand.
+Updating across the change that made a withdrawal's network fee its own disposal (and gave Lost withdrawals no gain or loss) raises no task, but the next recalculation (or any add, edit or delete) changes those figures. **Settings → Ledger Review** in the app lists them beforehand.
 
 ## Health Checks
 
@@ -150,7 +150,7 @@ One check, on the `webui` daemon.
 Both volumes are copied whole (`sdk.Backups.ofVolumes('main', 'startos')`). StartOS stops the service first, so the SQLite file is copied at rest; there is no dump step.
 
 - **Included:** the database, the session key, the app's pre-upgrade copies in `backups/`, and `store.json`.
-- **Restore:** complete, including the generated password. A backup taken on an older package version is migrated forward on restore like an update (including the Recalculate Ledger task when it predates 0.8.0).
+- **Restore:** complete, including the generated password. A backup taken on an older package version is migrated forward on restore like an update (including the Recalculate Ledger task when it predates the gain-calculation fixes).
 - The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups.
 
 ## Limitations and Differences
@@ -160,6 +160,7 @@ Both volumes are copied whole (`sdk.Backups.ofVolumes('main', 'startos')`). Star
 3. **The first-run registration page never appears**; the login is set at install.
 4. **The MCP server is not hosted here.** It runs on the user's computer and connects to the MCP API address.
 5. **No riscv64 build.**
+6. **English and US taxes only.** The app's interface is in English and it produces US (IRS) tax forms. The store listing and release notes are translated; the actions are in English, like the app.
 
 ---
 
