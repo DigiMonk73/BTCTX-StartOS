@@ -20,7 +20,9 @@ Docker image, the macOS app and this package.
 4. Push a branch `release/vX.Y.Z` from that commit. `.github/workflows/release.yml`
    then builds the image (if `main` hasn't yet), the macOS `.dmg` and `.zip`
    and `btctx.s9pk`, creates the tag and one GitHub release with all three,
-   and mirrors `startos/` to BTCTX-StartOS (when `MIRROR_TOKEN` exists).
+   and mirrors `startos/` to BTCTX-StartOS (when `MIRROR_TOKEN` exists),
+   with a release there too (same `btctx.s9pk`, marked Latest). Nothing to
+   do in the mirror by hand.
 
 A package-only fix (no app change) keeps `VERSION` and raises the package
 revision instead (`0.9.0:0` → `0.9.0:1`, next section). Release it the same
@@ -127,11 +129,15 @@ token that can push there, including workflow files.
 6. In **DigiMonk73/BTCTX-MCP → Settings → Secrets and variables → Actions →
    New repository secret**: name `MIRROR_TOKEN`, paste the token, **Add secret**.
 7. Check: the next release run's "mirror" job pushes a commit "Sync from
-   DigiMonk73/BTCTX-MCP@…" and a tag `v<upstream>_<revision>` to BTCTX-StartOS.
+   DigiMonk73/BTCTX-MCP@…" and a tag `v<upstream>_<revision>` to BTCTX-StartOS,
+   and creates the release `v<upstream>:<revision>` on that tag with
+   `btctx.s9pk` (Contents: write covers releases).
 
 Without the token, sync by hand from a clone of BTCTX-MCP:
 
 ```sh
 scripts/sync-startos-mirror.sh           # clones the mirror to a temp dir, commits, doesn't push
 scripts/sync-startos-mirror.sh --push    # same, then pushes the commit and tag
+gh release download vX.Y.Z -p btctx.s9pk -D /tmp/pkg
+scripts/mirror-startos-release.sh vX.Y.Z /tmp/pkg/btctx.s9pk   # the mirror's release
 ```
