@@ -9,7 +9,25 @@ const shape = z.object({
   // Set when updating from before 0.8.0, whose calculation fixes only reach
   // existing transactions after a recalculation; cleared by Recalculate Ledger.
   recalculateLedger: z.boolean().optional().catch(undefined),
+  // Set when updating from before 1.2.0: replace a login still on the app's
+  // default (admin / password) once, then cleared (init/defaultLogin.ts).
+  checkDefaultLogin: z.boolean().optional().catch(undefined),
+  // The Price Source & Privacy action. 'unset' (or absent): BitcoinTX's own
+  // Settings decide; otherwise main.ts passes the choice as BTCTX_* variables
+  // and the app shows it read-only.
+  priceSource: z
+    .enum(['unset', 'off', 'public', 'mempool'])
+    .optional()
+    .catch(undefined),
+  mempoolFallback: z.boolean().optional().catch(undefined),
+  useTor: z.boolean().optional().catch(undefined),
+  // Set when updating from before 1.2.0, until the action runs: an optional
+  // task introduces it (init/priceSourceTask.ts).
+  priceSourceTask: z.boolean().optional().catch(undefined),
 })
+
+export type Store = z.infer<typeof shape>
+export type PriceSource = NonNullable<Store['priceSource']>
 
 /** Package state, on the `startos` volume that no subcontainer mounts. */
 export const storeJson = FileHelper.json(

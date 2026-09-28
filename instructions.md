@@ -2,22 +2,24 @@
 
 ## Documentation
 
-- [BitcoinTX README](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/README.md) — what the app does: transactions, FIFO lots, Form 8949 and Schedule D, imports.
-- [BitcoinTX MCP server](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md) — connecting an AI assistant: the tools it gets and how to configure it.
+- [What BitcoinTX does](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/README.md#features) — transactions, FIFO lots, Form 8949 and Schedule D, imports. (Its install and first-login sections are for Docker and the Mac app; on StartOS, follow this page.)
+- [BitcoinTX on StartOS](https://github.com/DigiMonk73/BTCTX-StartOS/blob/main/README.md) — how this package works: volumes, actions, tasks, dependencies, backups.
+- [BitcoinTX MCP server](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md#configure) — connecting an AI assistant: the tools it gets and how to configure it.
 
 ## What you get on StartOS
 
 - **Web UI**: the BitcoinTX app, behind your login.
 - **MCP API**: the address an AI assistant (Claude Desktop, Claude Code or any MCP client) uses to read and add transactions for you. It is the same server as the web UI; the AI uses an AI key you create in BitcoinTX, never your password.
 - **A generated login**: a random password replaces the app's default one at install.
+- **Prices from your own Mempool**, if you run it on this server: no address to copy, no certificate, and nothing is contacted until you choose.
 - **Backups**: your database, your login and BitcoinTX's own safety copies of the database are in every StartOS backup.
 
 ## Getting set up
 
 1. Run **Show Credentials** when prompted and keep the username and password somewhere safe.
-2. Start the service and open the **Web UI**. Log in with those credentials.
-3. In **Settings**, check the **Tax Timezone**: it decides which tax year a transaction late on December 31 belongs to.
-4. When BitcoinTX asks where to get Bitcoin prices, choose **My mempool server** if you run mempool (copy an address from the mempool service's Interfaces page), **Public price sites**, or **Off**. You can change it any time in **Settings > Privacy & Network** (see Privacy below).
+2. Run **Price Source & Privacy** when prompted: choose **My Mempool on this server** if you run Mempool here (or install it), **Public price sites** (optionally over Tor), **Off**, or **Choose in BitcoinTX** to decide in the app instead. See Privacy below.
+3. Start the service and open the **Web UI**. Log in with those credentials.
+4. In **Settings**, check the **Tax Timezone**: it decides which tax year a transaction late on December 31 belongs to.
 5. Add your transactions by hand, import a River CSV or a generic CSV (a generic CSV only into an empty ledger), or connect an AI assistant (below).
 
 You can change the username and password inside BitcoinTX (**Settings > Reset Username & Password**). Show Credentials keeps showing the generated password, so use yours after changing it.
@@ -30,11 +32,13 @@ Record deposits, withdrawals, transfers, buys and sells. Every change recalculat
 
 ### Privacy and your own node
 
-BitcoinTX sends your ledger nowhere, and it contacts nothing until you choose a price source.
+BitcoinTX sends your ledger nowhere, and it contacts nothing until you choose a price source with the **Price Source & Privacy** action (or in the app, **Settings > Privacy & Network**, if you pick **Choose in BitcoinTX**). A choice made in the action shows read-only in the app.
 
-- **Your own mempool** (best): the live price, block height and past prices come from it, and no public site is contacted. Its past prices start from when it was installed; for older days, turn on **Fall back to public price sites** or type the value in. BitcoinTX can't check StartOS's own certificate yet, so a mempool address starting with `https` (such as the `.local` ones) doesn't answer it: for now, turn on **Fall back to public price sites** with such an address, and BitcoinTX's log says when it used them.
-- **Public price sites**: the sites see your server's IP address but never one of your transaction dates, because past prices come from one download of the whole history that is the same for every install. To hide the IP address, send BitcoinTX's traffic through a VPN with the StartOS **Set Outbound Gateway** action.
+- **My Mempool on this server** (best): the live price, block height and past prices come from your Mempool service, reached inside StartOS, and no public site is contacted. StartOS lists Mempool as a dependency: install and start it if you haven't. Its past prices start from when it was installed; for older days, turn on **Fall back to public price sites** or type the value in. Mempool's own requests (its exchange rates) can go over Tor with its own setting.
+- **Public price sites**: the sites see your server's IP address but never one of your transaction dates, because past prices come from one download of the whole history that is the same for every install. To hide the IP address, turn on **Reach public price sites over Tor** (needs the Tor service), or send BitcoinTX's traffic through a VPN with the StartOS **Set Outbound Gateway** action.
 - **Off**: nothing is contacted; you type in USD values yourself.
+
+BitcoinTX's log says where each download of past prices came from, so you can check that no public site was asked.
 
 ### Connecting an AI assistant
 
@@ -53,15 +57,16 @@ The web UI's **Settings > Connect an AI Assistant** has the key, a setup prompt 
 
 The configuration holds your AI key: anyone who can read it can do what the key allows until you revoke it in BitcoinTX.
 
-**Set up an AI app before AI keys existed?** Its configuration holds your BitcoinTX password in plain text, and BitcoinTX no longer accepts it for AI access. Create a key (step 1), replace `BTCTX_USERNAME` and `BTCTX_PASSWORD` in that configuration with `BTCTX_AI_KEY`, then run **Reset Login Credentials** (or change your password in BitcoinTX), since the old one sat in that file.
-
 ### Actions
 
 - **Show Credentials**: the username and the generated password.
+- **Price Source & Privacy**: where BitcoinTX gets Bitcoin prices, as above. BitcoinTX restarts to apply it.
 - **Connect an AI Assistant**: everything an AI client needs, as above.
 - **Recalculate Ledger**: rebuilds every lot and gain from your transactions, like **Settings > Recalculate Ledger** in the app. Your transactions are not changed. Before running it after an update, open **Settings > Ledger Review** in the app: it lists every figure a recalculation would change.
 - **Reset Login Credentials**: if you are locked out, sets the username back to `admin` with a new random password. Your transactions are not touched.
 
 ## Limitations
+
+BitcoinTX is in English and produces US (IRS) tax forms. Beyond that:
 
 - **BitcoinTX cannot be downgraded.** Each update may upgrade the database, and older versions refuse a newer database. BitcoinTX keeps copies of the database from before its last few upgrades in its `backups` folder; to go back, restore a StartOS backup.

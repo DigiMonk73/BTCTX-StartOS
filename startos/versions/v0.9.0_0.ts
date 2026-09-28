@@ -11,7 +11,7 @@ import { sdk } from '../sdk'
  * 0.9.0 moved the generated login out of the app's volume into package
  * storage. Installs updating from 0.8.0:1 or older run this on the way up.
  */
-export const v0_9_0_0 = VersionInfo.of({
+export const v_0_9_0_0 = VersionInfo.of({
   version: '0.9.0:0',
   releaseNotes: {
     en_US: `BitcoinTX 0.9.0.

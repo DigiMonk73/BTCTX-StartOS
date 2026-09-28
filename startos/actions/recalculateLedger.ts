@@ -22,7 +22,7 @@ export const recalculateLedger = sdk.Action.withoutInput(
   }),
 
   async ({ effects }) => {
-    const output = await runAppCli(effects, ['recalculate'])
+    const output = await runAppCli(effects, ['recalculate'], { prices: true })
     await storeJson.merge(effects, { recalculateLedger: false })
     await sdk.action.clearTask(effects, RECALCULATE_TASK_ID)
 

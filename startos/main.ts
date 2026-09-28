@@ -1,5 +1,6 @@
 import { T } from '@start9labs/start-sdk'
 import { i18n } from './i18n'
+import { currentChoice, priceEnv } from './priceSource'
 import { sdk } from './sdk'
 import { appEnv, mainMounts, uiPort } from './utils'
 
@@ -26,6 +27,13 @@ async function appHealth(): Promise<Omit<T.NamedHealthCheckResult, 'name'>> {
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info(i18n('Starting BitcoinTX'))
 
+  // The Price Source & Privacy choice, with the bridge addresses of Mempool
+  // and Tor: a change to either restarts the service with the new settings.
+  const env = {
+    ...appEnv,
+    ...(await priceEnv(effects, await currentChoice(effects, true), true)),
+  }
+
   const app = sdk.SubContainer.of(
     effects,
     { imageId: 'main' },
@@ -42,7 +50,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
         exec: {
           command: ['python', '-m', 'backend.cli', 'migrate'],
           cwd: '/app',
-          env: appEnv,
+          env,
         },
         requires: [],
       })
@@ -60,7 +68,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
             '--no-access-log',
           ],
           cwd: '/app',
-          env: appEnv,
+          env,
         },
         ready: {
           display: i18n('Web Interface'),

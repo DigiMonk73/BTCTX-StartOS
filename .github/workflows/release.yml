@@ -1,66 +1,20 @@
-# Runs in DigiMonk73/BTCTX-StartOS (the mirror of BTCTX-MCP's startos/), so the
-# package can be built on its own, e.g. by Start9 after forking it. Releases
-# are normally built by BTCTX-MCP's release workflow; this one runs only when
-# asked: push a branch release/v<upstream>_<revision> or run it from the
-# Actions tab. Inert inside BTCTX-MCP.
+# Start9's standard workflow (see build.yml).
 name: Release
 
 on:
   push:
-    branches: ['release/*']
-  workflow_dispatch:
-
-permissions:
-  contents: write
+    tags:
+      - 'v*.*'
 
 jobs:
   release:
-    runs-on: ubuntu-latest
-    env:
-      START_CLI_VERSION: v2.1.0
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Tools (squashfs, start-cli, containerd image store for multi-arch)
-        run: |
-          sudo apt-get update -q && sudo apt-get install -y -q squashfs-tools squashfs-tools-ng
-          sudo curl -sSL -o /usr/local/bin/start-cli \
-            "https://github.com/Start9Labs/start-technologies/releases/download/start-cli%2F${START_CLI_VERSION}/start-cli_x86_64-linux"
-          sudo chmod +x /usr/local/bin/start-cli && start-cli --version
-          echo '{"features":{"containerd-snapshotter":true}}' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-      - name: Build the bundle and read the pinned image
-        id: m
-        run: |
-          npm ci
-          npm run build
-          node --no-deprecation scripts/check-manifest.mjs
-          echo "image=$(node -p "require('./javascript/index.js').manifest.images.main.source.dockerTag" 2>/dev/null)" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p "require('./javascript/index.js').manifest.version" 2>/dev/null)" >> "$GITHUB_OUTPUT"
-      - name: Pull the image (both architectures)
-        run: |
-          docker pull --platform linux/amd64 "${{ steps.m.outputs.image }}"
-          docker pull --platform linux/arm64 "${{ steps.m.outputs.image }}"
-      - name: Signing key (DEV_KEY, else a throwaway key)
-        env:
-          DEV_KEY: ${{ secrets.DEV_KEY }}
-        run: scripts/signing-key.sh "$GITHUB_WORKSPACE/.."
-      - name: Pack
-        run: |
-          make universal
-          start-cli s9pk inspect btctx.s9pk manifest | jq '{id, version, gitHash}'
-      - name: Create the release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.m.outputs.version }}
-        run: |
-          TAG="v${VERSION/:/_}"
-          NOTES=$(node -p "require('./javascript/index.js').manifest.releaseNotes.en_US" 2>/dev/null)
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" btctx.s9pk --clobber
-          else
-            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --notes "$NOTES" btctx.s9pk
-          fi
+    uses: Start9Labs/start-technologies/.github/workflows/release.yml@master
+    with:
+      RELEASE_REGISTRY: ${{ vars.RELEASE_REGISTRY }}
+      S3_S9PKS_BASE_URL: ${{ vars.S3_S9PKS_BASE_URL }}
+    secrets:
+      DEV_KEY: ${{ secrets.DEV_KEY }}
+      S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+      S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+    permissions:
+      contents: write

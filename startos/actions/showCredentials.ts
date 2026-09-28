@@ -26,9 +26,9 @@ export const showCredentials = sdk.Action.withoutInput(
             'Log in to BitcoinTX with these. If you changed the password inside BitcoinTX, use that one instead; run Reset Login Credentials if you have lost it.',
           )
         : i18n(
-            'This install predates generated passwords, so the original default login is shown. If you changed it inside BitcoinTX, use yours; run Reset Login Credentials if you have lost it.',
+            'This install predates generated passwords and its password was set inside BitcoinTX: use yours. Run Reset Login Credentials if you have lost it.',
           ),
-      result: credentialsResult(password ?? 'password'),
+      result: credentialsResult(password ?? null),
     }
   },
 )

@@ -66,9 +66,9 @@ export const connectAi = sdk.Action.withoutInput(
     const urls = await mcpUrls(effects)
     const url = urls[0] ?? 'https://your-server.local/api'
     const ca = await rootCa(effects)
-    // Pinned to this package's release: the AI app runs exactly that code.
-    const release = `v${current.options.version.split(':')[0]}`
-    const source = `git+https://github.com/DigiMonk73/BTCTX-MCP.git@${release}#subdirectory=mcp_server`
+    // The connector from PyPI, pinned to this package's release: the AI app
+    // runs exactly that version.
+    const pkg = `btctx-mcp==${current.options.version.split(':')[0]}`
 
     const env: Record<string, string> = {
       BTCTX_URL: url,
@@ -80,7 +80,7 @@ export const connectAi = sdk.Action.withoutInput(
         mcpServers: {
           bitcointx: {
             command: 'uvx',
-            args: ['--from', source, 'btctx-mcp'],
+            args: [pkg],
             env,
           },
         },
@@ -92,7 +92,7 @@ export const connectAi = sdk.Action.withoutInput(
     const claudeCode = [
       'claude mcp add bitcointx',
       ...Object.entries(env).map(([k, v]) => `-e ${k}=${q(v)}`),
-      `-- uvx --from ${q(source)} btctx-mcp`,
+      `-- uvx ${q(pkg)}`,
     ].join(' ')
 
     const value = [
@@ -125,9 +125,6 @@ export const connectAi = sdk.Action.withoutInput(
         i18n(
           'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config (or mcp.json in LM Studio) and replace ${placeholder} with your AI key. The Claude Code command works too, but keeps the key in your shell history, so prefer the configuration file.',
           { placeholder: KEY_PLACEHOLDER },
-        ),
-        i18n(
-          'Set up an AI app before this update? Its configuration holds your BitcoinTX password: replace BTCTX_USERNAME and BTCTX_PASSWORD there with BTCTX_AI_KEY, then run Reset Login Credentials (or change your password in BitcoinTX).',
         ),
       ].join(' '),
       result: { type: 'group', value },

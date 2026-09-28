@@ -6,7 +6,7 @@ import { storeJson } from '../fileModels/store.json'
  * period. Updating from anything older raises the Recalculate Ledger task
  * (init/recalculateTask.ts) so the fixes reach existing transactions.
  */
-export const v0_8_0_0 = VersionInfo.of({
+export const v_0_8_0_0 = VersionInfo.of({
   version: '0.8.0:0',
   releaseNotes: {
     en_US:

@@ -46,7 +46,6 @@ const dict = {
   'The username and password for logging in to BitcoinTX.': 34,
   'Login Credentials': 35,
   'Log in to BitcoinTX with these. If you changed the password inside BitcoinTX, use that one instead; run Reset Login Credentials if you have lost it.': 36,
-  'This install predates generated passwords, so the original default login is shown. If you changed it inside BitcoinTX, use yours; run Reset Login Credentials if you have lost it.': 37,
 
   // init/installCredentials.ts
   'Creating the BitcoinTX database': 38,
@@ -60,7 +59,34 @@ const dict = {
   'Everything an AI assistant such as Claude Desktop, Claude Code or LM Studio needs to add transactions for you: the address, the certificate to trust, and a ready-to-paste configuration for the AI key you create in BitcoinTX.': 42,
   'First create an AI key in BitcoinTX: open the Web UI, go to Settings > Connect an AI Assistant, turn on Let AI assistants use BitcoinTX, then click Create AI key. BitcoinTX shows the key once.': 43,
   'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config (or mcp.json in LM Studio) and replace ${placeholder} with your AI key. The Claude Code command works too, but keeps the key in your shell history, so prefer the configuration file.': 44,
-  'Set up an AI app before this update? Its configuration holds your BitcoinTX password: replace BTCTX_USERNAME and BTCTX_PASSWORD there with BTCTX_AI_KEY, then run Reset Login Credentials (or change your password in BitcoinTX).': 45,
+
+  // actions/priceSource.ts
+  'Price source': 46,
+  'Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere.': 47,
+  'My Mempool on this server': 48,
+  'Public price sites': 49,
+  'Off: contact nothing': 50,
+  'Choose in BitcoinTX (Settings > Privacy & Network)': 51,
+  'Fall back to public price sites': 52,
+  "With My Mempool: when it doesn't answer, or doesn't have a past day's price, ask the public sites instead. Off: nothing goes to a public site.": 53,
+  'Reach public price sites over Tor': 54,
+  'Needs the Tor service on this server. The public sites then never see your IP address. Used with Public price sites, or with the fallback on.': 55,
+  'Price Source & Privacy': 56,
+  'Choose where BitcoinTX gets Bitcoin prices: your own Mempool on this server, public price sites (optionally over Tor), or nothing at all.': 57,
+  'BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no prices unless the fallback is on.': 58,
+  'BitcoinTX restarts and asks the public price sites.': 59,
+  'BitcoinTX restarts and contacts nothing. Prices it already stored still work; for anything else, type the USD value in.': 60,
+  "BitcoinTX's own Settings > Privacy & Network decide again. It restarts if it was set here before.": 61,
+  'Public sites are reached over Tor: install and start the Tor service if it is not running, or those requests fail.': 62,
+  'Price Source Saved': 63,
+
+  // init/priceSourceTask.ts
+  'Choose where BitcoinTX gets Bitcoin prices: your own Mempool, public sites (optionally over Tor), or nothing.': 64,
+  'New: choose here where BitcoinTX gets Bitcoin prices. My Mempool on this server now works directly, without an https address.': 65,
+
+  // init/defaultLogin.ts, actions/showCredentials.ts
+  'Your BitcoinTX login was still the original admin / password, so it now has a generated password. Copy it before starting the service.': 66,
+  'This install predates generated passwords and its password was set inside BitcoinTX: use yours. Run Reset Login Credentials if you have lost it.': 67,
 } as const
 
 /**

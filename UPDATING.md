@@ -3,7 +3,32 @@
 This package is developed in `startos/` of
 [DigiMonk73/BTCTX-MCP](https://github.com/DigiMonk73/BTCTX-MCP), together with
 the app it runs. One `VERSION` file (repository root) versions the app, the
-Docker image, the macOS app and this package.
+Docker image, the macOS app and this package. It is mirrored as-is to
+[DigiMonk73/BTCTX-StartOS](https://github.com/DigiMonk73/BTCTX-StartOS), the
+repository Start9 forks into Start9-Community for its community registry.
+
+## Determining the upstream version
+
+The upstream is the BitcoinTX app, released from DigiMonk73/BTCTX-MCP as
+`vX.Y.Z` together with its image `ghcr.io/digimonk73/btctx-mcp:vX.Y.Z`:
+
+```sh
+gh release view -R DigiMonk73/BTCTX-MCP --json tagName -q .tagName
+```
+
+The current pin is `images.main.source.dockerTag` in
+`startos/manifest/index.ts` (`ghcr.io/digimonk73/btctx-mcp:v<version>`).
+
+## Applying the bump
+
+Upstream releases bring their own package changes, so a bump normally arrives
+as a pull request from DigiMonk73/BTCTX-StartOS. By hand:
+
+- Bump `dockerTag` in `startos/manifest/index.ts` to
+  `ghcr.io/digimonk73/btctx-mcp:v<new version>`.
+- Set `version` in `startos/versions/current.ts` to `<new version>:0`, with
+  release notes; move the old `current.ts` to its own file first if its `up`
+  migration does work (see "The package version" below).
 
 ## Releasing a new version
 
@@ -27,9 +52,33 @@ released code only and moves by fast-forwarding to `develop`.
    workflow refuses a commit that isn't on `main`). `.github/workflows/release.yml`
    then builds the image (if `main` hasn't yet), the macOS `.dmg` and `.zip`
    and `btctx.s9pk`, creates the tag and one GitHub release with all three,
-   and mirrors `startos/` to BTCTX-StartOS (when `MIRROR_TOKEN` exists),
-   with a release there too (same `btctx.s9pk`, marked Latest). Nothing to
-   do in the mirror by hand. Delete the `release/…` branch afterwards.
+   publishes the AI connector to PyPI (`btctx-mcp==X.Y.Z`, not for `-N`
+   revisions), and pushes `startos/` to BTCTX-StartOS's `main` (when
+   `MIRROR_TOKEN` exists). There, Start9's **Tag and Release** workflow
+   tags it `v<upstream>_<revision>` and creates the release with its own
+   build (it needs `DEV_KEY` and `REFERENCE_REGISTRY`, below). Delete the
+   `release/…` branch afterwards.
+5. Once Start9 has forked the mirror: open a pull request from
+   DigiMonk73/BTCTX-StartOS `main` to their fork (below).
+
+## After Start9 forks the mirror
+
+Start9 forks DigiMonk73/BTCTX-StartOS into Start9-Community; from then on
+their fork is the package's upstream for the registry. They change it too:
+template updates about monthly (their `syncNext` workflow keeps a `next`
+branch), SDK bumps and review fixes, by pull requests on their fork.
+
+- **Before each sync, take their changes:** on `develop`, run
+  `scripts/start9-pull.sh` to see what they changed since they last took
+  ours, then `scripts/start9-pull.sh --apply`, review, run the checks and
+  commit. The mirror sync replaces the mirror's contents with `startos/`,
+  so anything not brought back here would be undone.
+- **Contribute each release:** after the release workflow has updated the
+  mirror, open a pull request from DigiMonk73/BTCTX-StartOS `main` to the
+  fork's default branch (`gh pr create -R Start9-Community/BTCTX-StartOS
+  --head DigiMonk73:main`). Start9 reviews and merges it (usually within a
+  day) and publishes to the community registry.
+- The fork's name may differ: `START9_FORK=Owner/Repo scripts/start9-pull.sh`.
 
 A package-only fix (no app change) keeps `VERSION` and raises the package
 revision instead (`0.9.0:0` → `0.9.0:1`, next section). Release it the same
@@ -42,15 +91,22 @@ way with the tag `vX.Y.Z-N`: a `## [v0.9.0-1]` CHANGELOG section and a branch
 its release notes (what StartOS shows before updating) and its migration.
 
 - **New `VERSION`:** if the old `current.ts` has an `up` migration that does
-  real work, first copy it to `vX_Y_Z_N.ts` (renaming the export), add it to
-  `other` in `versions/index.ts`, then write the new `current.ts` with an empty
-  `up` and `down: IMPOSSIBLE`. A migration belongs to the version that
+  real work, first copy it to `vX.Y.Z_N.ts` exporting `v_X_Y_Z_N` (Start9's
+  naming, e.g. `v1.2.0_0.ts` exports `v_1_2_0_0`), add it to `other` in
+  `versions/index.ts`, then write the new `current.ts` with an empty `up`
+  and `down: IMPOSSIBLE`. A migration belongs to the version that
   introduced it; overwriting it in place would skip it for installs that
   haven't run it yet. If the old `up` is empty, just edit `current.ts`.
-- **Revision only** (package change, same app): bump the number after the `:`.
+- **Revision only** (package change, same app): bump the number after the
+  `:`, moving the old `current.ts` to its own file first in the same way if
+  its `up` does real work (1.2.0:0's does), or installs already on it would
+  run it again.
 - `down` is always `IMPOSSIBLE`: an older BitcoinTX refuses a database a newer
   one has migrated.
-- Release notes are user-facing: what changed for them, in plain language.
+- Release notes are user-facing: what changed for them, in plain language,
+  in `en_US`, `es_ES`, `de_DE`, `pl_PL` and `fr_FR`, each ending with the
+  CHANGELOG link. One-time instructions for updating users belong there, not
+  in `instructions.md` or action messages.
 
 Checks: `npm run check && npm run lint && npm run build && node scripts/check-manifest.mjs && npx prettier --check startos`
 (also run by the pre-push hook and CI), and `backend/tests/test_versions_agree.py`.
@@ -62,10 +118,14 @@ Checks: `npm run check && npm run lint && npm run build && node scripts/check-ma
 
 1. Read its CHANGELOG (in `node_modules/@start9labs/start-sdk/` after
    installing) for breaking changes and the minimum StartOS version.
-2. `npm install --save-exact @start9labs/start-sdk@<version>`
-3. Update `START_CLI_VERSION` in `.github/workflows/ci.yml`,
-   `.github/workflows/release.yml` and `startos/.github/workflows/release.yml`
-   to the start-cli release that matches the SDK.
+2. `npm install --save-exact @start9labs/start-sdk@<version>`, then
+   `npm update mempool-startos tor-startos` (the packages the dependency
+   constants come from; `overrides` keeps one SDK copy)
+3. Update `START_CLI_VERSION` in `.github/workflows/ci.yml` and
+   `.github/workflows/release.yml` to the start-cli release that matches the
+   SDK. (The mirror's workflows call Start9's shared ones, which pick their
+   own.) Once Start9 has forked the mirror, they may bump the SDK there
+   first: take it with `scripts/start9-pull.sh` instead.
 4. Run the checks, bump the package revision, release.
 
 ## Building locally
@@ -87,10 +147,10 @@ make universal                          # btctx.s9pk; `make x86` for one arch
 
 Sideload the result in StartOS (**Sideload** in the top bar).
 
-## One-time setup: the two secrets
+## One-time setup: secrets and a variable
 
 Until these exist, releases still work: each `btctx.s9pk` is signed with a
-new throwaway key and the mirror is not updated automatically.
+new throwaway key and the mirror is not updated (or released) automatically.
 
 ### DEV_KEY: the package signing key
 
@@ -115,10 +175,23 @@ signed with one key that you keep.
    including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----`
    lines. **Add secret.**
    (With the GitHub CLI instead: `gh secret set DEV_KEY -R DigiMonk73/BTCTX-MCP < btctx-dev.key.pem`.)
-4. Add the same secret to **DigiMonk73/BTCTX-StartOS** if you ever build
-   releases there.
+4. Add the same secret to **DigiMonk73/BTCTX-StartOS** (Settings → Secrets
+   and variables → Actions → New repository secret, name `DEV_KEY`), where
+   Start9's Tag and Release workflow signs its build:
+   `gh secret set DEV_KEY -R DigiMonk73/BTCTX-StartOS < btctx-dev.key.pem`.
 5. Check: the next release run's "Signing key" step prints "Signing with
    DEV_KEY" and the public key from step 1.
+
+### REFERENCE_REGISTRY: the mirror's release check
+
+Start9's Tag and Release workflow first asks a registry whether this version
+is already published there, and skips the release if so. In
+**DigiMonk73/BTCTX-StartOS → Settings → Secrets and variables → Actions →
+Variables → New repository variable**: name `REFERENCE_REGISTRY`, value
+`https://community-registry.start9.com` (Start9's community registry). Or:
+`gh variable set REFERENCE_REGISTRY -R DigiMonk73/BTCTX-StartOS -b https://community-registry.start9.com`.
+Leave `RELEASE_REGISTRY` unset: the mirror then only makes a GitHub release,
+and Start9 publishes to its registries from its own fork.
 
 ### MIRROR_TOKEN: pushing to BTCTX-StartOS
 
@@ -136,15 +209,20 @@ token that can push there, including workflow files.
 6. In **DigiMonk73/BTCTX-MCP → Settings → Secrets and variables → Actions →
    New repository secret**: name `MIRROR_TOKEN`, paste the token, **Add secret**.
 7. Check: the next release run's "mirror" job pushes a commit "Sync from
-   DigiMonk73/BTCTX-MCP@…" and a tag `v<upstream>_<revision>` to BTCTX-StartOS,
-   and creates the release `v<upstream>:<revision>` on that tag with
-   `btctx.s9pk` (Contents: write covers releases).
+   DigiMonk73/BTCTX-MCP@…" to BTCTX-StartOS, whose Tag and Release workflow
+   then tags and releases it.
 
 Without the token, sync by hand from a clone of BTCTX-MCP:
 
 ```sh
 scripts/sync-startos-mirror.sh           # clones the mirror to a temp dir, commits, doesn't push
-scripts/sync-startos-mirror.sh --push    # same, then pushes the commit and tag
+scripts/sync-startos-mirror.sh --push    # same, then pushes the commit
+```
+
+If the mirror's Tag and Release workflow can't run (no `DEV_KEY` or
+`REFERENCE_REGISTRY` there yet), release it with this repository's package:
+
+```sh
 gh release download vX.Y.Z -p btctx.s9pk -D /tmp/pkg
-scripts/mirror-startos-release.sh vX.Y.Z /tmp/pkg/btctx.s9pk   # the mirror's release
+scripts/mirror-startos-release.sh vX.Y.Z /tmp/pkg/btctx.s9pk   # tag + release on the mirror
 ```

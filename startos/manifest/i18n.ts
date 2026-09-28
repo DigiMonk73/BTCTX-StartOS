@@ -23,3 +23,29 @@ export const long = {
   fr_FR:
     'BitcoinTX tient la comptabilité de vos bitcoins en partie double, avec un coût d’acquisition FIFO par compte, et remplit le formulaire 8949 et le Schedule D de l’IRS, y compris les cases du formulaire 1099-DA. Via MCP, vous pouvez connecter un assistant IA qui saisit les transactions à partir d’e-mails de plateformes d’échange, d’historiques de portefeuille ou de texte libre, avec un aperçu avant tout enregistrement. L’assistant est facultatif : BitcoinTX n’envoie votre registre nulle part, et un modèle local garde aussi la saisie par IA sur votre propre matériel (une IA dans le cloud envoie ce qu’elle lit à son fournisseur). Les prix peuvent venir de votre propre serveur mempool, et rien n’est contacté avant votre choix. L’application est en anglais et produit des formulaires fiscaux américains (IRS).',
 }
+
+export const mempoolDescription = {
+  en_US:
+    'Optional: your own source of Bitcoin prices and the block height, when you choose My Mempool on this server in Price Source & Privacy',
+  es_ES:
+    'Opcional: tu propia fuente de precios de bitcoin y de la altura de bloque, si eliges Mi Mempool en este servidor en Fuente de precios y privacidad',
+  de_DE:
+    'Optional: deine eigene Quelle für Bitcoin-Kurse und die Blockhöhe, wenn du unter Kursquelle & Datenschutz Mein Mempool auf diesem Server wählst',
+  pl_PL:
+    'Opcjonalnie: własne źródło cen bitcoina i wysokości bloku, gdy w Źródło cen i prywatność wybierzesz Mój Mempool na tym serwerze',
+  fr_FR:
+    'Facultatif : votre propre source de prix du bitcoin et de hauteur de bloc, si vous choisissez Mon Mempool sur ce serveur dans Source des prix et confidentialité',
+}
+
+export const torDescription = {
+  en_US:
+    'Optional: carries requests to public price sites when you turn on Tor in Price Source & Privacy, so they never see your IP address',
+  es_ES:
+    'Opcional: transporta las solicitudes a los sitios públicos de precios si activas Tor en Fuente de precios y privacidad, para que nunca vean tu dirección IP',
+  de_DE:
+    'Optional: leitet Anfragen an öffentliche Kursseiten weiter, wenn du Tor unter Kursquelle & Datenschutz einschaltest, sodass sie nie deine IP-Adresse sehen',
+  pl_PL:
+    'Opcjonalnie: przekazuje zapytania do publicznych serwisów z cenami, gdy włączysz Tor w Źródło cen i prywatność, więc nigdy nie widzą Twojego adresu IP',
+  fr_FR:
+    'Facultatif : achemine les requêtes vers les sites publics de prix quand vous activez Tor dans Source des prix et confidentialité, pour qu’ils ne voient jamais votre adresse IP',
+}
