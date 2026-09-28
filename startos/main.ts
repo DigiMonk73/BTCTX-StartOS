@@ -56,6 +56,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
             '0.0.0.0',
             '--port',
             String(uiPort),
+            // Request lines carry client addresses and dates (?date=...)
+            '--no-access-log',
           ],
           cwd: '/app',
           env: appEnv,

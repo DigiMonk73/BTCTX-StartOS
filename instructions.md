@@ -17,7 +17,7 @@
 1. Run **Show Credentials** when prompted and keep the username and password somewhere safe.
 2. Start the service and open the **Web UI**. Log in with those credentials.
 3. In **Settings**, check the **Tax Timezone**: it decides which tax year a transaction late on December 31 belongs to.
-4. Optional: in **Settings > Privacy & Network**, point BitcoinTX at your own mempool server (for example the one on this server) or a Tor proxy, or turn live data off.
+4. When BitcoinTX asks where to get Bitcoin prices, choose **My mempool server** if you run mempool (copy an address from the mempool service's Interfaces page), **Public price sites**, or **Off**. You can change it any time in **Settings > Privacy & Network** (see Privacy below).
 5. Add your transactions by hand, import a River CSV or a generic CSV (a generic CSV only into an empty ledger), or connect an AI assistant (below).
 
 You can change the username and password inside BitcoinTX (**Settings > Reset Username & Password**). Show Credentials keeps showing the generated password, so use yours after changing it.
@@ -27,6 +27,14 @@ You can change the username and password inside BitcoinTX (**Settings > Reset Us
 ### Web interface
 
 Record deposits, withdrawals, transfers, buys and sells. Every change recalculates the whole ledger, so backdated entries come out right. **Reports** produces Form 8949 and Schedule D as filled PDFs, a complete tax report and your transaction history. For 2025 and later, sales go into the Form 1099-DA boxes; if the 1099-DA your exchange sends shows something different for a sale, set **Broker form** on that transaction.
+
+### Privacy and your own node
+
+BitcoinTX sends your ledger nowhere, and it contacts nothing until you choose a price source.
+
+- **Your own mempool** (best): the live price, block height and past prices come from it, and no public site is contacted. Its past prices start from when it was installed; for older days, turn on **Fall back to public price sites** or type the value in. BitcoinTX can't check StartOS's own certificate yet, so a mempool address starting with `https` (such as the `.local` ones) doesn't answer it: for now, turn on **Fall back to public price sites** with such an address, and BitcoinTX's log says when it used them.
+- **Public price sites**: the sites see your server's IP address but never one of your transaction dates, because past prices come from one download of the whole history that is the same for every install. To hide the IP address, send BitcoinTX's traffic through a VPN with the StartOS **Set Outbound Gateway** action.
+- **Off**: nothing is contacted; you type in USD values yourself.
 
 ### Connecting an AI assistant
 

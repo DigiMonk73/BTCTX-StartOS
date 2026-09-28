@@ -3,6 +3,7 @@ import { i18n } from '../i18n'
 import { hostId, mcpInterfaceId } from '../interfaces'
 import { sdk } from '../sdk'
 import { uiPort } from '../utils'
+import { current } from '../versions/current'
 
 const CA_FILE = 'btctx-root-ca.crt'
 // The AI key is created in BitcoinTX (Settings) and shown only there, once.
@@ -65,10 +66,9 @@ export const connectAi = sdk.Action.withoutInput(
     const urls = await mcpUrls(effects)
     const url = urls[0] ?? 'https://your-server.local/api'
     const ca = await rootCa(effects)
-    // main holds released code only: uvx checks it each time the AI app
-    // starts, so the MCP server updates itself.
-    const source =
-      'git+https://github.com/DigiMonk73/BTCTX-MCP.git@main#subdirectory=mcp_server'
+    // Pinned to this package's release: the AI app runs exactly that code.
+    const release = `v${current.options.version.split(':')[0]}`
+    const source = `git+https://github.com/DigiMonk73/BTCTX-MCP.git@${release}#subdirectory=mcp_server`
 
     const env: Record<string, string> = {
       BTCTX_URL: url,
