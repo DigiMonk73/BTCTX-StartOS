@@ -11,7 +11,7 @@ const inputSpec = InputSpec.of({
   source: Value.select({
     name: i18n('Price source'),
     description: i18n(
-      'Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere.',
+      'Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere. Public price sites (Kraken, CoinGecko, Blockchain.info, Blockstream, mempool.space, Bitstamp, Coinbase) see your IP address and when BitcoinTX is open, never your transaction dates.',
     ),
     default: 'unset',
     values: {

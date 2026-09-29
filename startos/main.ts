@@ -66,6 +66,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
             String(uiPort),
             // Request lines carry client addresses and dates (?date=...)
             '--no-access-log',
+            // No "server: uvicorn" header on the responses
+            '--no-server-header',
           ],
           cwd: '/app',
           env,

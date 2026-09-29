@@ -62,7 +62,7 @@ const dict = {
 
   // actions/priceSource.ts
   'Price source': 46,
-  'Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere.': 47,
+  'Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere. Public price sites (Kraken, CoinGecko, Blockchain.info, Blockstream, mempool.space, Bitstamp, Coinbase) see your IP address and when BitcoinTX is open, never your transaction dates.': 47,
   'My Mempool on this server': 48,
   'Public price sites': 49,
   'Off: contact nothing': 50,
