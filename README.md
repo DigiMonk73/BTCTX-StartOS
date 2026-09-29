@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.svg" alt="BitcoinTX Logo" width="21%">
+  <img src="icon.webp" alt="BitcoinTX Logo" width="21%">
 </p>
 
 # BitcoinTX on StartOS

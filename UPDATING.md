@@ -76,13 +76,22 @@ branch), SDK bumps and review fixes, by pull requests on their fork.
   `scripts/start9-pull.sh` to see what they changed since they last took
   ours, then `scripts/start9-pull.sh --apply`, review, run the checks and
   commit. The mirror sync replaces the mirror's contents with `startos/`,
-  so anything not brought back here would be undone.
-- **Contribute each release:** after the release workflow has updated the
-  mirror, open a pull request from DigiMonk73/BTCTX-StartOS `main` to the
-  fork's default branch (`gh pr create -R Start9-Community/BTCTX-StartOS
-  --head DigiMonk73:main`). Start9 reviews and merges it (usually within a
-  day) and publishes to the community registry.
-- The fork's name may differ: `START9_FORK=Owner/Repo scripts/start9-pull.sh`.
+  so anything not brought back here would be undone. The release workflow
+  runs `scripts/start9-pull.sh --check` first and stops before publishing
+  anything if their changes aren't in `startos/`.
+- **Contribute each release, only by a pull request:** from
+  DigiMonk73/BTCTX-StartOS `main` to the fork's default branch. After the
+  mirror push, the release workflow opens an issue in BTCTX-MCP, "Send
+  vX.Y.Z to Start9: open the pull request", with a link that opens GitHub's
+  pull-request page ready to create; or `gh pr create -R <fork> --head
+  DigiMonk73:main`. Start9 reviews and merges it and publishes to the
+  community registry. While a pull request of ours is still open there, the
+  mirror push adds the new release to it, and no issue is opened.
+- The script finds the fork itself (Start9 may rename it, and it keeps the
+  mirror's default branch unless they change it): `scripts/start9-pull.sh
+  --fork` prints it. If they made a new repository instead of a fork, set
+  it in `START9_FORK=Owner/Repo`, and in BTCTX-MCP's repository variable
+  `START9_FORK` for the release workflow.
 
 A package-only fix (no app change) keeps `VERSION` and raises the package
 revision instead (`0.9.0:0` → `0.9.0:1`, next section). Release it the same
