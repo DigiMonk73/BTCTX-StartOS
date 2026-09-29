@@ -171,7 +171,8 @@ Both volumes are copied whole (`sdk.Backups.ofVolumes('main', 'startos')`). Star
 
 - **Included:** the database, the session key, the app's pre-upgrade copies in `backups/`, and `store.json`.
 - **Restore:** complete, including the generated password. A backup taken on an older package version is migrated forward on restore like an update (including the Recalculate Ledger task when it predates the gain-calculation fixes).
-- The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups.
+- **Address after a restore:** a restore is a fresh install, so StartOS may assign the web UI and MCP API a new port (ports are kept across restarts and updates, released on uninstall). Rerun **Connect an AI Assistant** and update the AI client's `BTCTX_URL`.
+- The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups. Restoring one of those in the app brings back the ledger and settings but keeps the login and AI key in use, so Show Credentials stays right.
 
 ## Limitations and Differences
 

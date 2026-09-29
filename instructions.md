@@ -57,6 +57,8 @@ The web UI's **Settings > Connect an AI Assistant** has the key, a setup prompt 
 
 The configuration holds your AI key: anyone who can read it can do what the key allows until you revoke it in BitcoinTX.
 
+If BitcoinTX's address changes (StartOS can give it a new port after you restore it from a backup), run **Connect an AI Assistant** again and update `BTCTX_URL` in your AI app.
+
 ### Actions
 
 - **Show Credentials**: the username and the generated password.

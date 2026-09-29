@@ -44,7 +44,9 @@ released code only and moves by fast-forwarding to `develop`.
    - the package version (next section)
 2. Move the `## [Unreleased]` section of `docs/CHANGELOG.md` to
    `## [vX.Y.Z] - <date> - <summary>`.
-3. Push `develop` and wait for CI, then fast-forward `main` to it
+3. Push `develop` and wait for CI. Run the agent release tests
+   (`docs/AGENT-TESTS.md`) on that commit's CI artifacts; a blocker FAIL
+   stops the release. Then fast-forward `main` to it
    (`git checkout main && git merge --ff-only develop && git push`).
    `.github/workflows/image.yml` publishes the image
    `ghcr.io/digimonk73/btctx-mcp:vX.Y.Z`.
@@ -126,7 +128,9 @@ Checks: `npm run check && npm run lint && npm run build && node scripts/check-ma
    SDK. (The mirror's workflows call Start9's shared ones, which pick their
    own.) Once Start9 has forked the mirror, they may bump the SDK there
    first: take it with `scripts/start9-pull.sh` instead.
-4. Run the checks, bump the package revision, release.
+4. If the new SDK's typescript-eslint accepts a newer TypeScript, raise the
+   `typescript` limit for `/startos` in `.github/dependabot.yml`.
+5. Run the checks, bump the package revision, release.
 
 ## Building locally
 

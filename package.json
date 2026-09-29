@@ -13,9 +13,9 @@
     "tor-startos": "github:Start9Labs/tor-startos#next"
   },
   "devDependencies": {
-    "@types/node": "^22.19.20",
-    "@vercel/ncc": "^0.44.0",
-    "prettier": "^3.8.4",
+    "@types/node": "^22.20.4",
+    "@vercel/ncc": "^0.45.0",
+    "prettier": "^3.9.9",
     "typescript": "^6.0.3"
   },
   "prettier": {
