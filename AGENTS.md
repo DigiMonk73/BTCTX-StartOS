@@ -1,7 +1,7 @@
 # AGENTS.md
 
 This is the StartOS service package for BitcoinTX: it builds `btctx.s9pk` with
-start-sdk 2.0.9. It lives in `startos/` of
+the start-sdk (`package.json`). It lives in `startos/` of
 [DigiMonk73/BTCTX-MCP](https://github.com/DigiMonk73/BTCTX-MCP) (the app) and
 is mirrored as-is to [DigiMonk73/BTCTX-StartOS](https://github.com/DigiMonk73/BTCTX-StartOS),
 the repository Start9 forks for its community registry. **Edit it in
@@ -18,10 +18,17 @@ Keep `README.md` (technical reference for an AI support or administering
 agent) and `instructions.md` (end-user docs) in sync with your changes.
 Releasing, bumping versions and the signing/mirror secrets: `UPDATING.md`.
 
-Bugs and feature requests are GitHub issues on BTCTX-MCP. Don't record work in
-the repo instead: no `TODO.md`, `NOTES.md` or `PLAN.md`.
+Work this package's `TODO.md` from top to bottom: one `- [ ]` line per item,
+removed when it's done, added when you defer work. Bugs and feature requests
+are GitHub issues on BTCTX-MCP. No `NOTES.md` or `PLAN.md`: plans live in
+BTCTX-MCP's `docs/temp/`.
 
-## This package
+Everything here follows Start9's packaging guide to the letter (layout,
+`README.md` headings, `instructions.md`, `TODO.md`): Start9 reviews the
+package against it. BTCTX-MCP's `backend/tests/test_startos_conformance.py`
+checks the rules a script can check.
+
+## This repo
 
 - **The app contract is `backend/cli.py` and `GET /api/health`** in the app
   (documented in `docs/STARTOS_COMPATIBILITY.md`). Credentials, migrations and

@@ -2,9 +2,11 @@
 
 ## Documentation
 
-- [What BitcoinTX does](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/README.md#features) — transactions, FIFO lots, Form 8949 and Schedule D, imports. (Its install and first-login sections are for Docker and the Mac app; on StartOS, follow this page.)
-- [BitcoinTX on StartOS](https://github.com/DigiMonk73/BTCTX-StartOS/blob/main/README.md) — how this package works: volumes, actions, tasks, dependencies, backups.
-- [BitcoinTX MCP server](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md#configure) — connecting an AI assistant: the tools it gets and how to configure it.
+- [BitcoinTX README](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/README.md) — what BitcoinTX does: transactions, lots, tax forms, imports
+- [BitcoinTX MCP server](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md) — connecting an AI assistant
+
+The BitcoinTX README's install and first-login steps are for Docker and the
+Mac app; on StartOS, follow this page.
 
 ## What you get on StartOS
 

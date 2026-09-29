@@ -190,6 +190,8 @@ BitcoinTX on StartOS is the same app as on Docker; these are the differences and
 
 ## Quick Reference for AI Consumers
 
+The package's operable surface in one block, its keys in section order.
+
 ```yaml
 package_id: btctx
 image: ghcr.io/digimonk73/btctx-mcp # pinned tag = package upstream version

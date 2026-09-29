@@ -43,7 +43,9 @@ released code only and moves by fast-forwarding to `develop`.
      `ghcr.io/digimonk73/btctx-mcp:v<VERSION>`
    - the package version (next section)
 2. Move the `## [Unreleased]` section of `docs/CHANGELOG.md` to
-   `## [vX.Y.Z] - <date> - <summary>`.
+   `## [vX.Y.Z] - <date> - <summary>`, and remove the ticked items from
+   `docs/temp/TODO.md` and `docs/ROADMAP.md` (the CHANGELOG has them now).
+   `TODO.md` here has none: its items are removed as they're done.
 3. Push `develop` and wait for CI. Run the agent release tests
    (`docs/AGENT-TESTS.md`) on that commit's CI artifacts; a blocker FAIL
    stops the release. Then fast-forward `main` to it
