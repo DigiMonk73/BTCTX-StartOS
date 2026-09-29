@@ -79,8 +79,8 @@ One model, `store.json` on the `startos` volume. The package writes no app confi
 | `priceSource`       | `unset` (or absent): BitcoinTX's Settings decide. `off`, `public` or `mempool`: set by Price Source & Privacy and passed as `BTCTX_PRICE_SOURCE`. |
 | `mempoolFallback`   | With `mempool`: ask public sites when Mempool can't answer (`BTCTX_MEMPOOL_FALLBACK`). |
 | `useTor`            | Public sites through Tor's SOCKS proxy (`BTCTX_PROXY_URL`), when public sites may be asked. |
-| `checkDefaultLogin` | Set by the 1.2.0 update; the next init replaces a login still on `admin` / `password`, then clears it. |
-| `priceSourceTask`   | Set by the 1.2.0 update; the next init raises the optional Price Source & Privacy task (unless a source was already chosen), then clears it. |
+| `checkDefaultLogin` | Set by the update that introduced generated passwords; the next init replaces a login still on `admin` / `password`, then clears it. |
+| `priceSourceTask`   | Set by the update that introduced Price Source & Privacy; the next init raises its optional task (unless a source was already chosen), then clears it. |
 
 ## Dependencies
 
@@ -88,8 +88,8 @@ Two, both optional and declared only while the Price Source & Privacy choice use
 
 | Dependency | When                                                         | Requirement                                   | Reached at |
 | ---------- | ------------------------------------------------------------ | --------------------------------------------- | ---------- |
-| `mempool`  | Price source **My Mempool on this server**                   | running, `>=3.3.1:18`, health check `webui`   | `http://<bridge>` from `sdk.host.getBridgeAddress` (host `main`, port 8080, `ssl: false`); its `/api/v1/prices`, `/api/blocks/tip/height`, `/api/v1/historical-price` |
-| `tor`      | **Reach public price sites over Tor**, with public sites or the fallback | running, `>=0.4.9.11:4`, health check `tor` | `socks5h://<bridge>` (host `socks`, port 9050, `fallbackPort: 9050`) |
+| `mempool`  | Price source **My Mempool on this server**                   | running, the minimum version in `dependencies.ts`, health check `webui` | `http://<bridge>` from `sdk.host.getBridgeAddress` (host `main`, port 8080, `ssl: false`); its `/api/v1/prices`, `/api/blocks/tip/height`, `/api/v1/historical-price` |
+| `tor`      | **Reach public price sites over Tor**, with public sites or the fallback | running, the minimum version in `dependencies.ts`, health check `tor` | `socks5h://<bridge>` (host `socks`, port 9050, `fallbackPort: 9050`) |
 
 The bridge address (`10.0.3.1:<assigned port>`) is plain HTTP inside StartOS: no certificate to trust and no LAN address that can change. `main.ts` reads both with `.const()`, so installing, removing or re-binding a dependency restarts BitcoinTX with the new address. While Mempool is missing, `BTCTX_MEMPOOL_URL` is left out and the app answers price requests with "install and start Mempool" (or asks public sites if the fallback is on). Tor's address falls back to its fixed port, so without Tor those requests fail instead of going out directly.
 
@@ -114,7 +114,7 @@ Install replaces the app's shipped default login (`admin` / `password`, which it
 
 Because the login is no longer the default, the app's first-run registration page does not appear.
 
-Installs from before generated passwords started with `admin` / `password`, which BitcoinTX 1.1.0 and later accept only with the setup code from the service log. The update to 1.2.0 (and a restore of an older backup) runs `set-password --if-default` with a generated password: if the login was still the default, the password is stored and the critical Show Credentials task is raised; otherwise nothing changes.
+Installs from before generated passwords started with `admin` / `password`, which BitcoinTX now accepts only with the setup code from the service log. The update that introduced generated passwords (and a restore of an older backup) runs `set-password --if-default` with a generated password: if the login was still the default, the password is stored and the critical Show Credentials task is raised; otherwise nothing changes.
 
 ## Actions
 
@@ -146,9 +146,9 @@ Three actions raise tasks.
 
 | Task                   | Severity    | Raised when                                        | Cleared when                     |
 | ---------------------- | ----------- | -------------------------------------------------- | -------------------------------- |
-| Show Credentials       | `critical`  | At install, after the password is set; after the 1.2.0 update replaced a default login | The action runs |
+| Show Credentials       | `critical`  | At install, after the password is set; after an update replaced a default login | The action runs |
 | Price Source & Privacy | `important` | At install                                         | The action runs                  |
-| Price Source & Privacy | `optional`  | Once, after updating (or restoring a backup) from before 1.2.0 without a choice made here | The action runs, or dismissed |
+| Price Source & Privacy | `optional`  | Once, after updating (or restoring a backup) from before this action existed, without a choice made here | The action runs, or dismissed |
 | Recalculate Ledger     | `important` | After updating (or restoring a backup) from a version with the old gain calculations | The action runs |
 
 The critical task blocks starting the service until the user has seen the password. The price task does not block: until a source is chosen, the app asks at first login and contacts nothing. The recalculation task does not block: the app works, but gains computed the old way (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
