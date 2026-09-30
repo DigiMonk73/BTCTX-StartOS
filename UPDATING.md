@@ -55,10 +55,11 @@ released code only and moves by fast-forwarding to `develop`.
 4. Push a branch `release/vX.Y.Z` from that commit on `main` (the release
    workflow refuses a commit that isn't on `main`). `.github/workflows/release.yml`
    then builds the image (if `main` hasn't yet), the macOS `.dmg` and `.zip`
-   and `btctx.s9pk`, creates the tag and one GitHub release with all three,
-   publishes the AI connector to PyPI (`btctx-mcp==X.Y.Z`, not for `-N`
-   revisions), and pushes `startos/` to BTCTX-StartOS's `main` (when
-   `MIRROR_TOKEN` exists). There, Start9's **Tag and Release** workflow
+   and `btctx.s9pk`, creates the tag and one GitHub release with all three
+   (titled `vX.Y.Z · StartOS package X.Y.Z:N`, the version StartOS and the
+   mirror show), publishes the AI connector to PyPI (`btctx-mcp==X.Y.Z`,
+   not for `-N` revisions), and pushes `startos/` to BTCTX-StartOS's `main`
+   (when `MIRROR_TOKEN` exists). There, Start9's **Tag and Release** workflow
    tags it `v<upstream>_<revision>` and creates the release with its own
    build (it needs `DEV_KEY` and `REFERENCE_REGISTRY`, below). Delete the
    `release/…` branch afterwards.
