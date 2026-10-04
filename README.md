@@ -112,7 +112,7 @@ The package, not the app's first-run page, creates the login: the service cannot
 2. Set Login Credentials runs `set-password` in a temporary subcontainer, which creates and migrates the database and sets `admin` / a random 24-character password, stores the password in `store.json` and shows it once.
 3. Because the login is no longer the app's shipped default (`admin` / `password`), the app's first-run registration page never appears.
 
-Installs from before generated passwords started with `admin` / `password`, which BitcoinTX now accepts only with the setup code from the service log. Updating (or restoring a backup) from before generated passwords runs `set-password --if-default` once with a random password nobody is shown: if the login was still the default, it is now locked and the critical Set Login Credentials task is raised. A login the owner set in the app is kept, but with no password stored the critical task is raised as well, and running it replaces that login.
+Installs from before generated passwords started with `admin` / `password`, which BitcoinTX now accepts only with the setup code from the service log. Updating (or restoring a backup) from before generated passwords runs `set-password --if-default` once with a random password nobody is shown: if the login was still the default, it is now locked and the critical Set Login Credentials task is raised. A login the owner set in the app is kept, but with no password stored the critical task is raised as well, and running it replaces that login. The update clears any outstanding task for the removed Show Credentials action.
 
 ## Actions
 
