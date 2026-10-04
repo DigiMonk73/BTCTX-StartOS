@@ -12,7 +12,7 @@
 [BitcoinTX](https://github.com/DigiMonk73/BTCTX-MCP) is a single-user Bitcoin portfolio and tax tracker: a double-entry ledger, per-account FIFO lots, and IRS Form 8949 / Schedule D, with an MCP server that lets an AI assistant enter transactions. This package runs its web server, replaces the default login with a generated one, and adds actions for choosing where prices come from (your own Mempool on this server, public sites optionally over Tor, or nothing), connecting an AI assistant and recalculating the ledger.
 
 - **Upstream repo:** <https://github.com/DigiMonk73/BTCTX-MCP> (this package is developed in its `startos/` directory)
-- **Wrapper repo:** <https://github.com/DigiMonk73/BTCTX-StartOS> (mirror of `startos/`)
+- **Package repo:** <https://github.com/Start9-Community/BTCTX-StartOS> (receives `startos/` from BTCTX-MCP by pull request)
 
 ---
 
@@ -74,7 +74,7 @@ One model, `store.json` on the `startos` volume. The package writes no app confi
 
 | Key                 | Meaning                                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `adminPassword`     | The password the package generated at install, on Reset Login Credentials, or when an update replaced a login still on the default. Not updated when the user changes the password inside BitcoinTX. Absent on installs from before generated passwords whose owner set a password in the app. |
+| `adminPassword`     | The password Set Login Credentials last generated. Not updated when the user changes the password inside BitcoinTX. While it is unset, the critical Set Login Credentials task stays raised. |
 | `recalculateLedger` | `true` after an update from a version with the old gain calculations (transfer fees, sale proceeds, holding period), until Recalculate Ledger runs. |
 | `priceSource`       | `unset` (or absent): BitcoinTX's Settings decide. `off`, `public` or `mempool`: set by Price Source & Privacy and passed as `BTCTX_PRICE_SOURCE`. |
 | `mempoolFallback`   | With `mempool`: ask public sites when Mempool can't answer (`BTCTX_MEMPOOL_FALLBACK`). |
@@ -106,23 +106,21 @@ Both are on the `ui-multi` host, so a domain added to one is available to both. 
 
 ## Installation and First-Run Flow
 
-Install replaces the app's shipped default login (`admin` / `password`, which its first-run page asks users to change) with a generated one.
+The package, not the app's first-run page, creates the login: the service cannot start until it exists.
 
-1. A temporary subcontainer runs `set-password`, which creates and migrates the database and sets `admin` / a random 24-character password. This is an install progress phase ("Creating the BitcoinTX database").
-2. The password is saved in `store.json`.
-3. A **critical** task points at Show Credentials, and an **important** one at Price Source & Privacy — see [Tasks](#tasks).
+1. Install creates nothing in the app. A **critical** task points at Set Login Credentials, and an **important** one at Price Source & Privacy — see [Tasks](#tasks).
+2. Set Login Credentials runs `set-password` in a temporary subcontainer, which creates and migrates the database and sets `admin` / a random 24-character password, stores the password in `store.json` and shows it once.
+3. Because the login is no longer the app's shipped default (`admin` / `password`), the app's first-run registration page never appears.
 
-Because the login is no longer the default, the app's first-run registration page does not appear.
-
-Installs from before generated passwords started with `admin` / `password`, which BitcoinTX now accepts only with the setup code from the service log. The update that introduced generated passwords (and a restore of an older backup) runs `set-password --if-default` with a generated password: if the login was still the default, the password is stored and the critical Show Credentials task is raised; otherwise nothing changes.
+Installs from before generated passwords started with `admin` / `password`, which BitcoinTX now accepts only with the setup code from the service log. Updating (or restoring a backup) from before generated passwords runs `set-password --if-default` once with a random password nobody is shown: if the login was still the default, it is now locked and the critical Set Login Credentials task is raised. A login the owner set in the app is kept, but with no password stored the critical task is raised as well, and running it replaces that login.
 
 ## Actions
 
-Five actions. All run with the service running or stopped, except Reset Login Credentials.
+Four actions. All run with the service running or stopped, except Set Login Credentials.
 
-### Show Credentials
+### Set Login Credentials
 
-Returns `admin` and the password from `store.json`. Changes nothing; safe to repeat. On installs from before generated passwords whose owner set a password in the app, it shows only the username. If the user changed the login inside BitcoinTX, the shown values are stale: Reset Login Credentials is the fix.
+Only while stopped. Sets the username to `admin` and a new random password through `set-password` (creating the database on a fresh install), stores it, and returns it once; nothing shows it again. Transactions and settings are untouched. Run it at install (its task), or when the owner has lost the password; on a later run it replaces any login set in the app, and the old password stops working.
 
 ### Price Source & Privacy
 
@@ -136,22 +134,18 @@ Returns the MCP API's https addresses (`.local` first), the StartOS root CA (fro
 
 Runs `python -m backend.cli recalculate` (migrates the schema first if needed): rebuilds every ledger entry, lot and disposal from the transactions, exactly like the app's Settings > Recalculate Ledger. Transactions are not modified. Takes seconds to a minute on large ledgers and may look up historical BTC prices for unpriced spends. Safe to repeat. Clears the `recalculateLedger` flag and its task. Resolves gains or lots that look wrong after an update with calculation fixes.
 
-### Reset Login Credentials
-
-Only while stopped. Sets the username to `admin` and a new random password through `set-password`, then stores it. Transactions and settings are untouched. Use when locked out; running it replaces any login the user set in the app.
-
 ## Tasks
 
 Three actions raise tasks.
 
 | Task                   | Severity    | Raised when                                        | Cleared when                     |
 | ---------------------- | ----------- | -------------------------------------------------- | -------------------------------- |
-| Show Credentials       | `critical`  | At install, after the password is set; after an update replaced a default login | The action runs |
+| Set Login Credentials  | `critical`  | While no password is stored (at install, and after an update from an install whose login was set in the app); after an update locked a default login | The action runs |
 | Price Source & Privacy | `important` | At install                                         | The action runs                  |
 | Price Source & Privacy | `optional`  | Once, after updating (or restoring a backup) from before this action existed, without a choice made here | The action runs, or dismissed |
 | Recalculate Ledger     | `important` | After updating (or restoring a backup) from a version with the old gain calculations | The action runs |
 
-The critical task blocks starting the service until the user has seen the password. The price task does not block: until a source is chosen, the app asks at first login and contacts nothing. The recalculation task does not block: the app works, but gains computed the old way (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
+The critical task blocks starting the service until the login exists. The price task does not block: until a source is chosen, the app asks at first login and contacts nothing. The recalculation task does not block: the app works, but gains computed the old way (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
 
 Updating across the change that made a withdrawal's network fee its own disposal (and gave Lost withdrawals no gain or loss) raises no task, but the next recalculation (or any add, edit or delete) changes those figures. **Settings → Ledger Review** in the app lists them beforehand.
 
@@ -172,19 +166,18 @@ Both volumes are copied whole (`sdk.Backups.ofVolumes('main', 'startos')`). Star
 - **Included:** the database, the session key, the app's pre-upgrade copies in `backups/`, and `store.json`.
 - **Restore:** complete, including the generated password. A backup taken on an older package version is migrated forward on restore like an update (including the Recalculate Ledger task when it predates the gain-calculation fixes).
 - **Address after a restore:** a restore is a fresh install, so StartOS may assign the web UI and MCP API a new port (ports are kept across restarts and updates, released on uninstall). Rerun **Connect an AI Assistant** and update the AI client's `BTCTX_URL`.
-- The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups. Restoring one of those in the app brings back the ledger and settings but keeps the login and AI key in use, so Show Credentials stays right.
+- The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups. Restoring one of those in the app brings back the ledger and settings but keeps the login and AI key in use.
 
 ## Limitations and Differences
 
 BitcoinTX on StartOS is the same app as on Docker; these are the differences and limits to know.
 
 1. **No downgrades.** Every version declares downgrades impossible: an older BitcoinTX refuses a database a newer one has migrated. Roll back by restoring a StartOS backup; the app's `backups/` folder also holds pre-upgrade copies of the database.
-2. **The generated password is not kept in sync** with changes made inside BitcoinTX.
-3. **The first-run registration page never appears**; the login is set at install.
-4. **The MCP server is not hosted here.** It runs on the user's computer and connects to the MCP API address.
-5. **No riscv64 build.**
-6. **English and US taxes only.** The app's interface is in English and it produces US (IRS) tax forms. The store listing, release notes, actions and tasks are translated (Spanish, German, Polish, French); they name the app's own screens in English.
-7. **Prices set in the action are read-only in the app.** Choose **Choose in BitcoinTX** in the action to manage them in the app again (for example for a mempool server on another machine, or your own proxy).
+2. **The first-run registration page never appears**; Set Login Credentials creates the login.
+3. **The MCP server is not hosted here.** It runs on the user's computer and connects to the MCP API address.
+4. **No riscv64 build.**
+5. **English and US taxes only.** The app's interface is in English and it produces US (IRS) tax forms. The store listing, release notes, actions and tasks are translated (Spanish, German, Polish, French); they name the app's own screens in English.
+6. **Prices set in the action are read-only in the app.** Choose **Choose in BitcoinTX** in the action to manage them in the app again (for example for a mempool server on another machine, or your own proxy).
 
 ---
 
@@ -220,13 +213,12 @@ interfaces:
   webui: { type: ui, port: 80, path: / }
   mcp: { type: api, port: 80, path: /api }
 actions:
-  - show-credentials
   - price-source
   - connect-ai
   - recalculate-ledger
-  - reset-credentials
+  - set-credentials
 tasks:
-  - { action: show-credentials, severity: critical }
+  - { action: set-credentials, severity: critical }
   - { action: price-source, severity: important } # install; optional after update
   - { action: recalculate-ledger, severity: important }
 health_checks:

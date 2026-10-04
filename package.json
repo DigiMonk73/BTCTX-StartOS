@@ -1,7 +1,7 @@
 {
   "name": "btctx-startos",
   "scripts": {
-    "build": "ncc build startos/index.ts -o ./javascript",
+    "build": "rm -rf ./javascript && ncc build startos/index.ts -o ./javascript",
     "check": "tsc --noEmit",
     "lint": "node node_modules/@start9labs/start-sdk/lint.mjs",
     "prettier": "prettier --write startos",

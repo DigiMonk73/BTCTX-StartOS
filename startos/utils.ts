@@ -1,5 +1,4 @@
 import { T, utils } from '@start9labs/start-sdk'
-import { i18n } from './i18n'
 import { currentChoice, priceEnv } from './priceSource'
 import { sdk } from './sdk'
 
@@ -89,33 +88,4 @@ export async function replaceDefaultLogin(
     { input: `${password}\n` },
   )
   return out.includes('Password set for user')
-}
-
-/** Action result group with the login credentials (the username alone without a password). */
-export function credentialsResult(password: string | null) {
-  const username = {
-    type: 'single' as const,
-    name: i18n('Username'),
-    description: null,
-    value: ADMIN_USERNAME,
-    copyable: true,
-    masked: false,
-    qr: false,
-  }
-  if (password === null) return { type: 'group' as const, value: [username] }
-  return {
-    type: 'group' as const,
-    value: [
-      username,
-      {
-        type: 'single' as const,
-        name: i18n('Password'),
-        description: null,
-        value: password,
-        copyable: true,
-        masked: true,
-        qr: false,
-      },
-    ],
-  }
 }

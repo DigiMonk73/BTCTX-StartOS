@@ -29,7 +29,9 @@ export const recalculateLedger = sdk.Action.withoutInput(
     return {
       version: '1',
       title: i18n('Ledger Recalculated'),
-      message: output.trim().split('\n').pop() ?? null,
+      message: i18n('Transactions recalculated: ${count}', {
+        count: output.match(/Recalculated (\d+) transaction/)?.[1] ?? '?',
+      }),
       result: null,
     }
   },

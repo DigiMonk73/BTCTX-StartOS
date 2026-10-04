@@ -4,8 +4,8 @@ import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 
 /**
- * Point to Price Source & Privacy: an important task at install (after Show
- * Credentials), an optional one once after an update from before 1.2.0.
+ * Point to Price Source & Privacy: an important task at install, an optional
+ * one once after an update from before 1.2.0.
  */
 export const priceSourceTask = sdk.setupOnInit(async (effects, kind) => {
   if (kind === 'install') {

@@ -1,5 +1,3 @@
-# Start9's standard workflow (see build.yml). Needs the repository variable
-# REFERENCE_REGISTRY and the secret DEV_KEY (startos/UPDATING.md).
 name: Tag and Release
 
 on:

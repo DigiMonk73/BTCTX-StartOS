@@ -34,23 +34,6 @@ const dict = {
   'This rebuilds all lots and gains from your transactions. Your transactions themselves are not changed. It can take a minute on a large ledger.': 26,
   'Ledger Recalculated': 27,
 
-  // actions/resetCredentials.ts
-  'Reset Login Credentials': 28,
-  'Set the username back to "admin" and generate a new random password. Use this if you are locked out.': 29,
-  'This replaces your current username and password. Your transactions are not touched.': 30,
-  'Credentials Reset': 31,
-  'Log in to BitcoinTX with these. Show Credentials displays them again later.': 32,
-
-  // actions/showCredentials.ts
-  'Show Credentials': 33,
-  'The username and password for logging in to BitcoinTX.': 34,
-  'Login Credentials': 35,
-  'Log in to BitcoinTX with these. If you changed the password inside BitcoinTX, use that one instead; run Reset Login Credentials if you have lost it.': 36,
-
-  // init/installCredentials.ts
-  'Creating the BitcoinTX database': 38,
-  'Copy your BitcoinTX login before starting the service': 39,
-
   // init/recalculateTask.ts
   'This update corrects how transfer fees, sale proceeds and the one-year holding period are calculated. Recalculate once so the corrections reach your existing transactions.': 40,
 
@@ -84,9 +67,17 @@ const dict = {
   'Choose where BitcoinTX gets Bitcoin prices: your own Mempool, public sites (optionally over Tor), or nothing.': 64,
   'New: choose here where BitcoinTX gets Bitcoin prices. My Mempool on this server now works directly, without an https address.': 65,
 
-  // init/defaultLogin.ts, actions/showCredentials.ts
-  'Your BitcoinTX login was still the original admin / password, so it now has a generated password. Copy it before starting the service.': 66,
-  'This install predates generated passwords and its password was set inside BitcoinTX: use yours. Run Reset Login Credentials if you have lost it.': 67,
+  // actions/setCredentials.ts, init/watchCredentials.ts, init/defaultLogin.ts
+  'This replaces your current username and password. Your transactions are not touched.': 30,
+  'Login Credentials': 35,
+  'Set Login Credentials': 68,
+  'Generate a random password for logging in to BitcoinTX, with the username "admin". Run it again if you lose the password.': 69,
+  'Log in to BitcoinTX with these and keep them somewhere safe: they are shown only now. If you lose them, run this action again.': 70,
+  'Create your BitcoinTX login before starting the service': 71,
+  'Your BitcoinTX login was still the original admin / password, so it has been locked. Set a new login before starting the service.': 72,
+
+  // actions/recalculateLedger.ts
+  'Transactions recalculated: ${count}': 73,
 } as const
 
 /**

@@ -1,4 +1,3 @@
-# Start9's standard workflow (see build.yml).
 name: Release
 
 on:

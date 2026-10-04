@@ -12,19 +12,19 @@ Mac app; on StartOS, follow this page.
 
 - **Web UI**: the BitcoinTX app, behind your login.
 - **MCP API**: the address an AI assistant (Claude Desktop, Claude Code or any MCP client) uses to read and add transactions for you. It is the same server as the web UI; the AI uses an AI key you create in BitcoinTX, never your password.
-- **A generated login**: a random password replaces the app's default one at install.
+- **A generated login**: StartOS creates your login with a random password; the app's default one never works.
 - **Prices from your own Mempool**, if you run it on this server: no address to copy, no certificate, and nothing is contacted until you choose.
 - **Backups**: your database, your login and BitcoinTX's own safety copies of the database are in every StartOS backup.
 
 ## Getting set up
 
-1. Run **Show Credentials** when prompted and keep the username and password somewhere safe.
+1. Run **Set Login Credentials** when prompted. It shows the username and password once: keep them somewhere safe.
 2. Run **Price Source & Privacy** when prompted: choose **My Mempool on this server** if you run Mempool here (or install it), **Public price sites** (optionally over Tor), **Off**, or **Choose in BitcoinTX** to decide in the app instead. See Privacy below.
 3. Start the service and open the **Web UI**. Log in with those credentials.
 4. In **Settings**, check the **Tax Timezone**: it decides which tax year a transaction late on December 31 belongs to.
 5. Add your transactions by hand, import a River CSV or a generic CSV (a generic CSV only into an empty ledger), or connect an AI assistant (below).
 
-You can change the username and password inside BitcoinTX (**Settings > Reset Username & Password**). Show Credentials keeps showing the generated password, so use yours after changing it.
+You can change the username and password inside BitcoinTX (**Settings > Reset Username & Password**).
 
 ## Using BitcoinTX
 
@@ -63,11 +63,10 @@ If BitcoinTX's address changes (StartOS can give it a new port after you restore
 
 ### Actions
 
-- **Show Credentials**: the username and the generated password.
 - **Price Source & Privacy**: where BitcoinTX gets Bitcoin prices, as above. BitcoinTX restarts to apply it.
 - **Connect an AI Assistant**: everything an AI client needs, as above.
 - **Recalculate Ledger**: rebuilds every lot and gain from your transactions, like **Settings > Recalculate Ledger** in the app. Your transactions are not changed. Before running it after an update, open **Settings > Ledger Review** in the app: it lists every figure a recalculation would change.
-- **Reset Login Credentials**: if you are locked out, sets the username back to `admin` with a new random password. Your transactions are not touched.
+- **Set Login Credentials**: if you are locked out, stop BitcoinTX and run it: it sets the username back to `admin` with a new random password. Your transactions are not touched.
 
 ## Limitations
 
