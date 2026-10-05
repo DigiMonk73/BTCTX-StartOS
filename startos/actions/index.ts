@@ -2,12 +2,10 @@ import { sdk } from '../sdk'
 import { connectAi } from './connectAi'
 import { priceSource } from './priceSource'
 import { recalculateLedger } from './recalculateLedger'
-import { resetCredentials } from './resetCredentials'
-import { showCredentials } from './showCredentials'
+import { setCredentials } from './setCredentials'
 
 export const actions = sdk.Actions.of()
-  .addAction(showCredentials)
+  .addAction(setCredentials)
   .addAction(priceSource)
   .addAction(connectAi)
   .addAction(recalculateLedger)
-  .addAction(resetCredentials)

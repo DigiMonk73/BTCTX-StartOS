@@ -5,10 +5,10 @@ import { setInterfaces } from '../interfaces'
 import { sdk } from '../sdk'
 import { versionGraph } from '../versions'
 import { defaultLogin } from './defaultLogin'
-import { installCredentials } from './installCredentials'
 import { priceSourceTask } from './priceSourceTask'
 import { recalculateTask } from './recalculateTask'
 import { seedStore } from './seedStore'
+import { watchCredentials } from './watchCredentials'
 
 /**
  * Runs in this order on install, update, restore and container rebuild.
@@ -21,8 +21,8 @@ export const init = sdk.setupInit(
   setInterfaces,
   setDependencies,
   actions,
-  installCredentials,
   defaultLogin,
+  watchCredentials,
   priceSourceTask,
   recalculateTask,
 )

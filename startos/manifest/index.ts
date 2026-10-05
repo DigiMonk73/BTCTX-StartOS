@@ -5,7 +5,7 @@ export const manifest = setupManifest({
   id: 'btctx',
   title: 'BitcoinTX',
   license: 'MIT',
-  packageRepo: 'https://github.com/DigiMonk73/BTCTX-StartOS',
+  packageRepo: 'https://github.com/Start9-Community/BTCTX-StartOS',
   upstreamRepo: 'https://github.com/DigiMonk73/BTCTX-MCP',
   marketingUrl: 'https://digimonk73.github.io/btctx-site/',
   donationUrl: null,
