@@ -32,11 +32,11 @@ as a pull request from DigiMonk73/BTCTX-StartOS. By hand:
 
 ## Releasing a new version
 
-Branches (`CLAUDE.md`, "Branches"): work happens on `develop`; `main` holds
-released code only and moves by fast-forwarding to `develop`.
+Branches (BTCTX-MCP's `AGENTS.md`, "Branches"): work reaches `develop` by pull request;
+`main` holds released code only and moves by fast-forwarding to `develop`.
 
-1. On `develop`, bump the version everywhere it is written (the tests fail
-   until all agree):
+1. In a pull request into `develop`, bump the version everywhere it is
+   written (the tests fail until all agree):
    - `VERSION` and the two `CFBundle…Version` values in `desktop/BitcoinTX.spec`
    - `version` in `mcp_server/pyproject.toml` (the AI connector)
    - `dockerTag` in `startos/startos/manifest/index.ts`:
@@ -44,12 +44,12 @@ released code only and moves by fast-forwarding to `develop`.
    - the package version (next section)
 2. Move the `## [Unreleased]` section of `docs/CHANGELOG.md` to
    `## [vX.Y.Z] - <date> - <summary>`, and remove the ticked items from
-   `docs/temp/TODO.md` and `docs/ROADMAP.md` (the CHANGELOG has them now).
+   `docs/ROADMAP.md` (the CHANGELOG has them now).
    `TODO.md` here has none: its items are removed as they're done.
-3. Push `develop` and wait for CI. Run the agent release tests
+3. Once it has merged, wait for CI on `develop`. Run the agent release tests
    (`docs/AGENT-TESTS.md`) on that commit's CI artifacts; a blocker FAIL
    stops the release. Then fast-forward `main` to it
-   (`git checkout main && git merge --ff-only develop && git push`).
+   (`git fetch origin && git checkout main && git merge --ff-only origin/develop && git push`).
    `.github/workflows/image.yml` publishes the image
    `ghcr.io/digimonk73/btctx-mcp:vX.Y.Z`.
 4. Push a branch `release/vX.Y.Z` from that commit on `main` (the release
@@ -73,19 +73,23 @@ their fork is the package's upstream for the registry. They change it too:
 template updates about monthly (their `syncNext` workflow keeps a `next`
 branch), SDK bumps and review fixes, by pull requests on their fork.
 
-- **Before each sync, take their changes:** on `develop`, run
-  `scripts/start9-pull.sh` to see what they changed since they last took
-  ours, then `scripts/start9-pull.sh --apply`, review, run the checks and
-  commit. The mirror sync replaces the mirror's contents with `startos/`,
-  so anything not brought back here would be undone. The release workflow
-  runs `scripts/start9-pull.sh --check` first and stops before publishing
-  anything if their changes aren't in `startos/`.
+- **Before each sync, take their changes:** on a branch cut from `develop`,
+  run `scripts/start9-pull.sh` to see what they changed since they last took
+  ours, then `scripts/start9-pull.sh --apply`, review, run the checks,
+  commit and open a pull request into `develop`. `--apply` also records
+  their commit in BTCTX-MCP's `scripts/start9-taken`; commit it with the
+  change, so later checks count only what they changed since. The mirror sync replaces
+  the mirror's contents with `startos/`, so anything not brought back here
+  would be undone. The sync runs `scripts/start9-pull.sh --check` first and
+  stops if their changes aren't in `startos/`, and so does the release
+  workflow, before publishing anything.
 - **Contribute each release, only by a pull request:** from
-  DigiMonk73/BTCTX-StartOS `main` to the fork's default branch. After the
-  mirror push, the release workflow opens an issue in BTCTX-MCP, "Send
-  vX.Y.Z to Start9: open the pull request", with a link that opens GitHub's
-  pull-request page ready to create; or `gh pr create -R <fork> --head
-  DigiMonk73:main`. Start9 reviews and merges it and publishes to the
+  DigiMonk73/BTCTX-StartOS `main` to the fork's default branch. The sync
+  first fast-forwards the mirror's `main` to the fork's branch, so the pull
+  request shows only our changes. After the mirror push, the release
+  workflow opens an issue in BTCTX-MCP, "Send vX.Y.Z to Start9: open the
+  pull request", with a link that opens GitHub's pull-request page ready to
+  create; or `gh pr create -R <fork> --head DigiMonk73:main`. Start9 reviews and merges it and publishes to the
   community registry. While a pull request of ours is still open there, the
   mirror push adds the new release to it, and no issue is opened.
 - The script finds the fork itself (Start9 may rename it, and it keeps the

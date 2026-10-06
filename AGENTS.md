@@ -17,7 +17,7 @@ Work this package's `TODO.md` from top to bottom. Keep `README.md` (technical re
 ## This repo
 
 - **Two homes.** The package is developed in `startos/` of
-  [DigiMonk73/BTCTX-MCP](https://github.com/DigiMonk73/BTCTX-MCP) (on `develop`),
+  [DigiMonk73/BTCTX-MCP](https://github.com/DigiMonk73/BTCTX-MCP) (by pull request into `develop`),
   mirrored to [DigiMonk73/BTCTX-StartOS](https://github.com/DigiMonk73/BTCTX-StartOS),
   and reaches [Start9-Community/BTCTX-StartOS](https://github.com/Start9-Community/BTCTX-StartOS)
   only as a pull request from that mirror. A change made on the Start9 fork must be
