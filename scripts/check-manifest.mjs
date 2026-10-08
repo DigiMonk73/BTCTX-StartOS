@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Sanity checks on the bundled manifest (run after `npm run build`), for CI
+// Sanity checks on the bundled manifest (run after `make javascript/index.js`), for CI
 // and the pre-push hook: the things that would break existing installs or
 // ship the wrong image if they drifted.
 import { existsSync, readFileSync } from 'node:fs'

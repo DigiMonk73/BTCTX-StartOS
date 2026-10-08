@@ -48,6 +48,19 @@ function single(name: string, value: string) {
   }
 }
 
+function multiline(name: string, value: string, filename?: string) {
+  return {
+    type: 'multiline' as const,
+    name,
+    description: null,
+    value,
+    copyable: true,
+    masked: false,
+    qr: false,
+    filename,
+  }
+}
+
 export const connectAi = sdk.Action.withoutInput(
   'connect-ai',
 
@@ -98,8 +111,8 @@ export const connectAi = sdk.Action.withoutInput(
     const value = [
       single(i18n('MCP address (BTCTX_URL)'), url),
       ...urls.slice(1).map((u) => single(i18n('Other address'), u)),
-      ...(ca ? [single(i18n('Root CA certificate'), ca)] : []),
-      single(i18n('Claude Desktop configuration'), desktopConfig),
+      ...(ca ? [multiline(i18n('Root CA certificate'), ca, CA_FILE)] : []),
+      multiline(i18n('Claude Desktop configuration'), desktopConfig),
       single(i18n('Claude Code command'), claudeCode),
     ]
 
