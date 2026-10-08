@@ -45,7 +45,7 @@ const dict = {
 
   // actions/priceSource.ts
   'Price source': 46,
-  'Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere. Public price sites (Kraken, CoinGecko, Blockchain.info, Blockstream, mempool.space, Bitstamp, Coinbase) see your IP address and when BitcoinTX is open, never your transaction dates.': 47,
+  "Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere.\n- My Mempool on this server: asks your Mempool service, which must be installed and running.\n- Public price sites: asks Kraken, CoinGecko, Blockchain.info, Blockstream, mempool.space, Bitstamp and Coinbase. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Off: BitcoinTX contacts nothing. Prices it already stored still work; type any other USD value in yourself.\n- Choose in BitcoinTX: the app's own Settings > Privacy & Network decide.": 47,
   'My Mempool on this server': 48,
   'Public price sites': 49,
   'Off: contact nothing': 50,

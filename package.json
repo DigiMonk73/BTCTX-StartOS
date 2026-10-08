@@ -1,28 +1,13 @@
 {
   "name": "btctx-startos",
   "scripts": {
-    "build": "rm -rf ./javascript && ncc build startos/index.ts -o ./javascript",
-    "check": "tsc --noEmit",
     "lint": "node node_modules/@start9labs/start-sdk/lint.mjs",
-    "prettier": "prettier --write startos",
     "format:check": "prettier --check startos"
   },
   "dependencies": {
-    "@start9labs/start-sdk": "2.0.9",
+    "@start9labs/start-sdk": "3.0.3",
     "mempool-startos": "github:Start9Labs/mempool-startos#next",
     "tor-startos": "github:Start9Labs/tor-startos#next"
-  },
-  "devDependencies": {
-    "@types/node": "^22.20.4",
-    "@vercel/ncc": "^0.45.0",
-    "prettier": "^3.9.9",
-    "typescript": "^6.0.3"
-  },
-  "prettier": {
-    "trailingComma": "all",
-    "tabWidth": 2,
-    "semi": false,
-    "singleQuote": true
   },
   "overrides": {
     "@start9labs/start-sdk": "$@start9labs/start-sdk"

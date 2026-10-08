@@ -45,7 +45,6 @@ released code only and moves by fast-forwarding to `develop`.
 2. Move the `## [Unreleased]` section of `docs/CHANGELOG.md` to
    `## [vX.Y.Z] - <date> - <summary>`, and remove the ticked items from
    `docs/temp/TODO.md` and `docs/ROADMAP.md` (the CHANGELOG has them now).
-   `TODO.md` here has none: its items are removed as they're done.
 3. Push `develop` and wait for CI. Run the agent release tests
    (`docs/AGENT-TESTS.md`) on that commit's CI artifacts; a blocker FAIL
    stops the release. Then fast-forward `main` to it
@@ -122,8 +121,8 @@ its release notes (what StartOS shows before updating) and its migration.
   CHANGELOG link. One-time instructions for updating users belong there, not
   in `instructions.md` or action messages.
 
-Checks: `npm run check && npm run lint && npm run build && node scripts/check-manifest.mjs && npx prettier --check startos`
-(also run by the pre-push hook and CI), and `backend/tests/test_versions_agree.py`.
+Checks: `rm -rf javascript && make javascript/index.js && node scripts/check-manifest.mjs`
+(`make` type-checks, lints, format-checks and bundles), and `backend/tests/test_versions_agree.py`.
 
 ## Bumping the SDK
 
@@ -140,9 +139,7 @@ Checks: `npm run check && npm run lint && npm run build && node scripts/check-ma
    SDK. (The mirror's workflows call Start9's shared ones, which pick their
    own.) Once Start9 has forked the mirror, they may bump the SDK there
    first: take it with `scripts/start9-pull.sh` instead.
-4. If the new SDK's typescript-eslint accepts a newer TypeScript, raise the
-   `typescript` limit for `/startos` in `.github/dependabot.yml`.
-5. Run the checks, bump the package revision, release.
+4. Run the checks, bump the package revision, release.
 
 ## Building locally
 

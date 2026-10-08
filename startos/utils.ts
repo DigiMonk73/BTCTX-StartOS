@@ -52,11 +52,12 @@ export async function runAppCli(
     mainMounts(),
     `cli-${args[0]}`,
     async (sub) => {
-      const res = await sub.execFail(
-        ['python', '-m', 'backend.cli', ...args],
-        { cwd: '/app', env, input: opts.input },
-        10 * 60_000,
-      )
+      const res = await sub.execFail(['python', '-m', 'backend.cli', ...args], {
+        cwd: '/app',
+        env,
+        input: opts.input,
+        timeout: 10 * 60_000,
+      })
       return res.stdout.toString()
     },
   )

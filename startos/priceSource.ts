@@ -7,7 +7,7 @@ import { socksHostId, socksPort } from 'tor-startos/startos/utils'
 import { PriceSource, storeJson } from './fileModels/store.json'
 import { sdk } from './sdk'
 
-// The optional dependencies (manifest `dependencies`), reached over the
+// The optional dependencies (dependencies.ts), reached over the
 // StartOS bridge (10.0.3.1:<assigned port>, plain http inside the server):
 // no certificate, no LAN address that can change. Host ids and internal
 // ports come from their packages, the stable contract.
