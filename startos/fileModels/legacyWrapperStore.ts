@@ -10,5 +10,5 @@ export const LEGACY_WRAPPER_STORE = '.startos-wrapper.json'
  */
 export const legacyWrapperStore = FileHelper.json(
   { base: sdk.volumes.main, subpath: LEGACY_WRAPPER_STORE },
-  z.object({ adminPassword: z.string().optional().catch(undefined) }),
+  z.looseObject({ adminPassword: z.string().optional().catch(undefined) }),
 )

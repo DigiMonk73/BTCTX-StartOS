@@ -84,7 +84,7 @@ One model, `store.json` on the `startos` volume. The package writes no app confi
 
 ## Dependencies
 
-Two, both optional and declared only while the Price Source & Privacy choice uses them (`dependencies.ts`); nothing is required otherwise.
+Two, both optional (`dependencies.ts`). The manifest lists both; each one's `enabled` reads `store.json`, so a dependency becomes current, with the requirement below, only while the Price Source & Privacy choice uses it. Nothing is required otherwise.
 
 | Dependency | When                                                         | Requirement                                   | Reached at |
 | ---------- | ------------------------------------------------------------ | --------------------------------------------- | ---------- |
@@ -128,7 +128,7 @@ A form (prefilled from `store.json`): **Price source** (My Mempool on this serve
 
 ### Connect an AI Assistant
 
-Returns the MCP API's https addresses (`.local` first), the StartOS root CA (from `sdk.getSslCertificate`, last certificate in the chain), and a Claude Desktop config and `claude mcp add` command that run the MCP server with `uvx btctx-mcp==<this release>` (from PyPI, pinned to the package's version), with `YOUR_BITCOINTX_AI_KEY` where the key goes. It reads no credentials: the key is created and shown (once) only in the app. Changes nothing; safe to repeat. If the root CA can't be read, the message points to System > About this Server to download it. Resolves "the AI can't connect" (wrong URL, TLS verification failures).
+Returns the MCP API's https addresses (`.local` first), the StartOS root CA (from `sdk.getSslCertificate`, last certificate in the chain; shown as multi-line text and offered as a download named `btctx-root-ca.crt`), and a Claude Desktop config (multi-line text) and `claude mcp add` command that run the MCP server with `uvx btctx-mcp==<this release>` (from PyPI, pinned to the package's version), with `YOUR_BITCOINTX_AI_KEY` where the key goes. It reads no credentials: the key is created and shown (once) only in the app. Changes nothing; safe to repeat. If the root CA can't be read, the message points to System > About this Server to download it. Resolves "the AI can't connect" (wrong URL, TLS verification failures).
 
 ### Recalculate Ledger
 

@@ -1,7 +1,7 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const shape = z.object({
+const shape = z.looseObject({
   // The password Set Login Credentials generated. BitcoinTX owns the live
   // credential: a password changed in the app is not reflected here.
   adminPassword: z.string().optional().catch(undefined),
