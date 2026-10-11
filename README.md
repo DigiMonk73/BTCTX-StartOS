@@ -41,7 +41,7 @@ The image is the app's own published image, pulled rather than built: the same o
 | ------------- | ---------------------------------------------------------------------- |
 | Image         | `ghcr.io/digimonk73/btctx-mcp`, pinned to the package's upstream version |
 | Architectures | x86_64, aarch64                                                        |
-| Command       | `uvicorn backend.main:app --host 0.0.0.0 --port 80`, after a `migrate` oneshot |
+| Command       | `uvicorn backend.main:app --host 0.0.0.0 --port 80 --no-access-log --no-server-header` (no request lines in the log: they carry client addresses and dates), after a `migrate` oneshot |
 | Environment   | `DATABASE_FILE=/data/btctx.db`, `LOG_LEVEL=INFO`; the `BTCTX_*` price variables once chosen in Price Source & Privacy |
 
 | Subcontainer    | Lifetime            | Purpose                                                                    |
@@ -64,7 +64,7 @@ Two volumes: the app's data, and this package's own state, which the app never s
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `btctx.db`              | The SQLite ledger                                                                          |
 | `.btctx_secret_key`     | Session-cookie signing key, generated on first start (mode 600)                            |
-| `backups/`              | The app's copies of `btctx.db` from before a schema upgrade or an in-app restore; the newest 5 are kept |
+| `backups/`              | The app's copies of `btctx.db`: before a schema upgrade or an in-app restore (newest 5 kept), and those the AI key asks for (newest 3 kept) |
 
 Installs from before the separate `startos` volume also had `.startos-wrapper.json` on `main`; the update moves its password into `store.json` and deletes it.
 
@@ -128,7 +128,7 @@ A form (prefilled from `store.json`): **Price source** (My Mempool on this serve
 
 ### Connect an AI Assistant
 
-Returns the MCP API's https addresses (`.local` first), the StartOS root CA (from `sdk.getSslCertificate`, last certificate in the chain; shown as multi-line text and offered as a download named `btctx-root-ca.crt`), and a Claude Desktop config (multi-line text) and `claude mcp add` command that run the MCP server with `uvx btctx-mcp==<this release>` (from PyPI, pinned to the package's version), with `YOUR_BITCOINTX_AI_KEY` where the key goes. It reads no credentials: the key is created and shown (once) only in the app. Changes nothing; safe to repeat. If the root CA can't be read, the message points to System > About this Server to download it. Resolves "the AI can't connect" (wrong URL, TLS verification failures).
+Returns the MCP API's https addresses (`.local` first), the StartOS root CA (from `sdk.getSslCertificate`, last certificate in the chain; shown as multi-line text and offered as a download named `btctx-root-ca.crt`), and a Claude Desktop config (multi-line text) and `claude mcp add --scope user` command (every folder, not only the current one) that run the MCP server with `uvx btctx-mcp==<this release>` (from PyPI, pinned to the package's version), with `YOUR_BITCOINTX_AI_KEY` where the key goes. It reads no credentials: the key is created and shown (once) only in the app. Changes nothing; safe to repeat. If the root CA can't be read, the message points to System > About this Server to download it. Resolves "the AI can't connect" (wrong URL, TLS verification failures).
 
 ### Recalculate Ledger
 
@@ -163,10 +163,10 @@ One check, on the `webui` daemon.
 
 Both volumes are copied whole (`sdk.Backups.ofVolumes('main', 'startos')`). StartOS stops the service first, so the SQLite file is copied at rest; there is no dump step.
 
-- **Included:** the database, the session key, the app's pre-upgrade copies in `backups/`, and `store.json`.
+- **Included:** the database, the session key, the app's copies in `backups/`, and `store.json`.
 - **Restore:** complete, including the generated password. A backup taken on an older package version is migrated forward on restore like an update (including the Recalculate Ledger task when it predates the gain-calculation fixes).
 - **Address after a restore:** a restore is a fresh install, so StartOS may assign the web UI and MCP API a new port (ports are kept across restarts and updates, released on uninstall). Rerun **Connect an AI Assistant** and update the AI client's `BTCTX_URL`.
-- The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups. Restoring one of those in the app brings back the ledger and settings but keeps the login and AI key in use.
+- The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups. Restoring one of those in the app brings back the ledger and its other settings but keeps the login, the AI key and the price settings in use.
 
 ## Limitations and Differences
 

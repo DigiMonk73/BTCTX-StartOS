@@ -103,7 +103,7 @@ export const connectAi = sdk.Action.withoutInput(
     )
     const q = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`
     const claudeCode = [
-      'claude mcp add bitcointx',
+      'claude mcp add --scope user bitcointx',
       ...Object.entries(env).map(([k, v]) => `-e ${k}=${q(v)}`),
       `-- uvx ${q(pkg)}`,
     ].join(' ')

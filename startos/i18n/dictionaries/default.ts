@@ -13,7 +13,7 @@ const dict = {
   'The BitcoinTX web interface': 6,
   'MCP API': 7,
 
-  // utils.ts
+  // actions/setCredentials.ts
   Username: 9,
   Password: 10,
 

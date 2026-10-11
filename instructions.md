@@ -5,8 +5,8 @@
 - [BitcoinTX README](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/README.md) — what BitcoinTX does: transactions, lots, tax forms, imports
 - [BitcoinTX MCP server](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md) — connecting an AI assistant
 
-The BitcoinTX README's install and first-login steps are for Docker and the
-Mac app; on StartOS, follow this page.
+The BitcoinTX README's Mac app, Docker and source steps don't apply here; on
+StartOS, follow this page.
 
 ## What you get on StartOS
 
@@ -31,6 +31,8 @@ You can change the username and password inside BitcoinTX (**Settings > Reset Us
 ### Web interface
 
 Record deposits, withdrawals, transfers, buys and sells. Every change recalculates the whole ledger, so backdated entries come out right. **Reports** produces Form 8949 and Schedule D as filled PDFs, a complete tax report and your transaction history. For 2025 and later, sales go into the Form 1099-DA boxes; if the 1099-DA your exchange sends shows something different for a sale, set **Broker form** on that transaction.
+
+BitcoinTX is software, not tax, legal or financial advice. It works from the records you enter: check its figures with a tax professional before you file.
 
 ### Privacy and your own node
 
@@ -61,6 +63,8 @@ The configuration holds your AI key: anyone who can read it can do what the key 
 
 If BitcoinTX's address changes (StartOS can give it a new port after you restore it from a backup), run **Connect an AI Assistant** again and update `BTCTX_URL` in your AI app.
 
+After each BitcoinTX update, update the connector too: in your AI app's configuration, change the version after `btctx-mcp==` to the version the **Connect an AI Assistant** action shows, and restart the AI app. Your AI key stays the same; don't paste the action's whole configuration over yours, since it has placeholders for the key and the certificate path. Until you update it, the assistant's replies say which version to set. Where to change it in each AI app: [Updating](https://github.com/DigiMonk73/BTCTX-MCP/blob/main/mcp_server/README.md#updating).
+
 ### Actions
 
 - **Price Source & Privacy**: where BitcoinTX gets Bitcoin prices, as above. BitcoinTX restarts to apply it.
@@ -72,4 +76,5 @@ If BitcoinTX's address changes (StartOS can give it a new port after you restore
 
 BitcoinTX is in English and produces US (IRS) tax forms. Beyond that:
 
+- **One wallet and one exchange.** BitcoinTX tracks one self-custody Wallet and one Exchange. Since 2025, IRS rules require cost basis to be figured wallet by wallet and account by account, so if you use several wallets or exchange accounts, BitcoinTX's gains can differ from what the rules give. Keep separate records for each, or ask your tax preparer.
 - **BitcoinTX cannot be downgraded.** Each update may upgrade the database, and older versions refuse a newer database. BitcoinTX keeps copies of the database from before its last few upgrades in its `backups` folder; to go back, restore a StartOS backup.
