@@ -42,6 +42,26 @@ export function asksPublicSites(c: PriceChoice): boolean {
   return c.source === 'public' || (c.source === 'mempool' && c.fallback)
 }
 
+/** Whether the choice uses Tor on this server: public sites through it, or
+ * "Decide in BitcoinTX" lending it to the app's own choice (#145). */
+export function usesTor(c: PriceChoice): boolean {
+  return c.tor && (asksPublicSites(c) || c.source === 'unset')
+}
+
+/** Whether Mempool is installed on this server: StartOS knows its bridge
+ * address without contacting anything (the action's "recommended" label). */
+export async function mempoolInstalled(effects: T.Effects): Promise<boolean> {
+  const address = await sdk.host
+    .getBridgeAddress(effects, {
+      packageId: MEMPOOL.packageId,
+      hostId: MEMPOOL.hostId,
+      internalPort: MEMPOOL.port,
+      ssl: false,
+    })
+    .once()
+  return Boolean(address)
+}
+
 /** The store's choice; `watch` restarts the caller when it changes. */
 export async function currentChoice(
   effects: T.Effects,
@@ -66,7 +86,13 @@ export async function priceEnv(
   choice: PriceChoice,
   watch: boolean,
 ): Promise<Record<string, string>> {
-  if (choice.source === 'unset') return {}
+  if (choice.source === 'unset') {
+    // The app's own choice decides; with Use Tor it gets this server's Tor,
+    // locked on in its Settings (BTCTX_TOR_PROXY_URL, #145)
+    return choice.tor
+      ? { BTCTX_TOR_PROXY_URL: `socks5h://${await torAddress(effects, watch)}` }
+      : {}
+  }
   const env: Record<string, string> = {
     BTCTX_PRICE_SOURCE: choice.source,
     BTCTX_MEMPOOL_FALLBACK: choice.fallback ? 'on' : 'off',
@@ -82,14 +108,19 @@ export async function priceEnv(
     if (address) env.BTCTX_MEMPOOL_URL = `http://${address}`
   }
   if (choice.tor && asksPublicSites(choice)) {
-    const socks = sdk.host.getBridgeAddress(effects, {
-      packageId: TOR.packageId,
-      hostId: TOR.hostId,
-      internalPort: TOR.port,
-      fallbackPort: TOR.port,
-    })
-    const address = watch ? await socks.const() : await socks.once()
-    env.BTCTX_PROXY_URL = `socks5h://${address}`
+    env.BTCTX_PROXY_URL = `socks5h://${await torAddress(effects, watch)}`
   }
   return env
+}
+
+/** Tor's SOCKS address on the bridge; its fixed port while Tor is missing,
+ * so requests fail rather than go out directly. */
+async function torAddress(effects: T.Effects, watch: boolean): Promise<string> {
+  const socks = sdk.host.getBridgeAddress(effects, {
+    packageId: TOR.packageId,
+    hostId: TOR.hostId,
+    internalPort: TOR.port,
+    fallbackPort: TOR.port,
+  })
+  return (watch ? await socks.const() : await socks.once()) as string
 }

@@ -1,6 +1,6 @@
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
-import { currentChoice } from '../priceSource'
+import { currentChoice, mempoolInstalled } from '../priceSource'
 import { sdk } from '../sdk'
 
 const { InputSpec, Value } = sdk
@@ -8,30 +8,39 @@ const { InputSpec, Value } = sdk
 export const PRICE_SOURCE_TASK_ID = 'choose-price-source'
 
 const inputSpec = InputSpec.of({
-  source: Value.select({
-    name: i18n('Price source'),
-    description: i18n(
-      "Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere.\n- My Mempool on this server: asks your Mempool service, which must be installed and running.\n- Public price sites: asks Kraken, CoinGecko, Blockchain.info, Blockstream, mempool.space, Bitstamp and Coinbase. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Off: BitcoinTX contacts nothing. Prices it already stored still work; type any other USD value in yourself.\n- Choose in BitcoinTX: the app's own Settings > Privacy & Network decide.",
-    ),
-    default: 'unset',
-    values: {
-      mempool: i18n('My Mempool on this server'),
-      public: i18n('Public price sites'),
-      off: i18n('Off: contact nothing'),
-      unset: i18n('Choose in BitcoinTX (Settings > Privacy & Network)'),
-    },
+  // A dynamic select, so the Mempool line can say it's installed (StartOS
+  // knows without contacting anything, #145 plan 2.4). Nothing is
+  // preselected until a choice was made: the owner picks, Nobody included.
+  source: Value.dynamicSelect(async ({ effects }) => {
+    const stored = await storeJson.read((s) => s.priceSource).once()
+    const installed = await mempoolInstalled(effects)
+    return {
+      name: i18n('Newer prices from'),
+      description: i18n(
+        "BitcoinTX's hourly price history (2013 on) is downloaded once from Bitstamp, checked against fingerprints that come with this version, when your choice allows public price sites. Your ledger is never sent anywhere.\n- My Mempool on this server: the most private; asks your Mempool service, which must be installed and running. It has hourly prices only from when it began recording: for older values, turn on the option below that asks public price sites when Mempool can't answer, or type them.\n- Public price sites: Bitstamp and Kraken for prices; Blockchain.info, Blockstream or mempool.space for the block height. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Nobody: fully offline. Prices BitcoinTX already has still work; type newer values yourself.\n- Decide in BitcoinTX instead: the app's own Settings > Privacy & Network decide, for example for a Mempool on another machine.",
+      ),
+      default: stored ?? null,
+      values: {
+        mempool: installed
+          ? i18n('My Mempool on this server (recommended: installed)')
+          : i18n('My Mempool on this server'),
+        public: i18n('Public price sites'),
+        off: i18n('Nobody: fully offline'),
+        unset: i18n('Decide in BitcoinTX instead'),
+      },
+    }
   }),
   fallback: Value.toggle({
-    name: i18n('Fall back to public price sites'),
+    name: i18n("If Mempool can't answer, ask public price sites"),
     description: i18n(
-      "With My Mempool: when it doesn't answer, or doesn't have a past day's price, ask the public sites instead. Off: nothing goes to a public site.",
+      "With My Mempool: when it doesn't answer, or has no price for an hour, ask public price sites instead; the hourly history is then downloaded once from Bitstamp. Off: nothing goes to a public site.",
     ),
     default: false,
   }),
   tor: Value.toggle({
-    name: i18n('Reach public price sites over Tor'),
+    name: i18n('Use Tor (the Tor service on this server)'),
     description: i18n(
-      'Needs the Tor service on this server. The public sites then never see your IP address. Used with Public price sites, or with the fallback on.',
+      "Needs the Tor service on this server. Public price sites then never see your IP address. Used with Public price sites, with My Mempool when it may ask public price sites, and with Decide in BitcoinTX instead, where BitcoinTX shows it as Tor on this server. Through Tor, Bitstamp currently refuses BitcoinTX's requests, so the hourly history and past prices don't download; only the live price works. Choose Public price sites without Tor to download them (once checked, the hourly history stays), use My Mempool on this server for newer values, or type them.",
     ),
     default: false,
   }),
@@ -43,7 +52,7 @@ export const priceSource = sdk.Action.withInput(
   async () => ({
     name: i18n('Price Source & Privacy'),
     description: i18n(
-      'Choose where BitcoinTX gets Bitcoin prices: your own Mempool on this server, public price sites (optionally over Tor), or nothing at all.',
+      'Choose who BitcoinTX asks for newer Bitcoin prices: your own Mempool on this server, public price sites (optionally over Tor), nobody, or decide in BitcoinTX.',
     ),
     warning: null,
     allowedStatuses: 'any',
@@ -55,7 +64,13 @@ export const priceSource = sdk.Action.withInput(
 
   async ({ effects }) => {
     const choice = await currentChoice(effects, false)
-    return { source: choice.source, fallback: choice.fallback, tor: choice.tor }
+    const stored = await storeJson.read((s) => s.priceSource).once()
+    // Never chosen: nothing preselected (the select's default is null then)
+    return {
+      ...(stored ? { source: choice.source } : {}),
+      fallback: choice.fallback,
+      tor: choice.tor,
+    }
   },
 
   async ({ effects, input }) => {
@@ -63,7 +78,6 @@ export const priceSource = sdk.Action.withInput(
       priceSource: input.source,
       mempoolFallback: input.fallback,
       useTor: input.tor,
-      priceSourceTask: false,
     })
     await sdk.action.clearTask(effects, PRICE_SOURCE_TASK_ID)
 
@@ -72,7 +86,7 @@ export const priceSource = sdk.Action.withInput(
       (input.source === 'mempool' && input.fallback)
     const messages = {
       mempool: i18n(
-        'BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no prices unless the fallback is on.',
+        "BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no newer prices, unless it may ask public price sites when Mempool can't answer.",
       ),
       public: i18n('BitcoinTX restarts and asks the public price sites.'),
       off: i18n(
@@ -88,7 +102,12 @@ export const priceSource = sdk.Action.withInput(
           i18n(
             'Public sites are reached over Tor: install and start the Tor service if it is not running, or those requests fail.',
           )
-        : ''
+        : input.tor && input.source === 'unset'
+          ? ' ' +
+            i18n(
+              "BitcoinTX's own choice can use the Tor service on this server: install and start it if it is not running.",
+            )
+          : ''
 
     return {
       version: '1',

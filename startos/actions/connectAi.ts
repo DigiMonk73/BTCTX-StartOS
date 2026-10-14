@@ -45,10 +45,15 @@ function single(name: string, value: string) {
     copyable: true,
     masked: false,
     qr: false,
+    launchable: false,
   }
 }
 
-function multiline(name: string, value: string, filename?: string) {
+function multiline(
+  name: string,
+  value: string,
+  filename: string | null = null,
+) {
   return {
     type: 'multiline' as const,
     name,

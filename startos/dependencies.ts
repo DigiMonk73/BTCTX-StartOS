@@ -1,11 +1,11 @@
 import { mempoolDescription, torDescription } from './manifest/i18n'
-import { asksPublicSites, currentChoice } from './priceSource'
+import { currentChoice, usesTor } from './priceSource'
 import { sdk } from './sdk'
 
 /**
  * Both optional, and only while the Price Source & Privacy action uses them:
  * Mempool for "My Mempool on this server", Tor for public price sites over
- * Tor. Nothing else is ever required. Ranges and health check ids follow
+ * Tor or lent to BitcoinTX's own choice (Decide in BitcoinTX with Use Tor). Nothing else is ever required. Ranges and health check ids follow
  * mempool-startos and tor-startos (as Am I Exposed uses them).
  */
 const mempool = sdk.Dependency.optional('mempool', {
@@ -30,10 +30,7 @@ const tor = sdk.Dependency.optional('tor', {
   versionRange: '>=0.4.9.11:4',
   kind: 'running',
   healthChecks: ['tor'],
-  enabled: async ({ effects }) => {
-    const choice = await currentChoice(effects, true)
-    return choice.tor && asksPublicSites(choice)
-  },
+  enabled: async ({ effects }) => usesTor(await currentChoice(effects, true)),
 })
 
 export const dependencies = sdk.Dependencies.of()

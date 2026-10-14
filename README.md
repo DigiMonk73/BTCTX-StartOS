@@ -42,7 +42,7 @@ The image is the app's own published image, pulled rather than built: the same o
 | Image         | `ghcr.io/digimonk73/btctx-mcp`, pinned to the package's upstream version |
 | Architectures | x86_64, aarch64                                                        |
 | Command       | `uvicorn backend.main:app --host 0.0.0.0 --port 80 --no-access-log --no-server-header` (no request lines in the log: they carry client addresses and dates), after a `migrate` oneshot |
-| Environment   | `DATABASE_FILE=/data/btctx.db`, `LOG_LEVEL=INFO`; the `BTCTX_*` price variables once chosen in Price Source & Privacy |
+| Environment   | `DATABASE_FILE=/data/btctx.db`, `LOG_LEVEL=INFO`, `BTCTX_HOST=startos` (the app's words name the action); the `BTCTX_*` price variables once chosen in Price Source & Privacy, or `BTCTX_TOR_PROXY_URL` with Decide in BitcoinTX and Use Tor |
 
 | Subcontainer    | Lifetime            | Purpose                                                                    |
 | --------------- | ------------------- | -------------------------------------------------------------------------- |
@@ -64,7 +64,8 @@ Two volumes: the app's data, and this package's own state, which the app never s
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `btctx.db`              | The SQLite ledger                                                                          |
 | `.btctx_secret_key`     | Session-cookie signing key, generated on first start (mode 600)                            |
-| `backups/`              | The app's copies of `btctx.db`: before a schema upgrade or an in-app restore (newest 5 kept), and those the AI key asks for (newest 3 kept) |
+| `btc-prices/`           | The hourly BTC price history (one `YYYY.csv` per year, about 3 MB), downloaded once from Bitstamp when the choice allows public price sites, each year checked against the fingerprint the release ships; deleting it only means it's downloaded again |
+| `backups/`              | The app's copies of `btctx.db`: before a schema upgrade or an in-app restore (newest 5 kept), before Ledger Review's hourly prices are applied (newest 5 kept, apart), and the AI copies: those the AI key asks for, and one before its first change in an hour, an edit or a deletion (newest 3 kept, plus, for a week, the oldest and the first copy of each day made before the AI changed anything that day) |
 
 Installs from before the separate `startos` volume also had `.startos-wrapper.json` on `main`; the update moves its password into `store.json` and deletes it.
 
@@ -75,12 +76,13 @@ One model, `store.json` on the `startos` volume. The package writes no app confi
 | Key                 | Meaning                                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `adminPassword`     | The password Set Login Credentials last generated. Not updated when the user changes the password inside BitcoinTX. While it is unset, the critical Set Login Credentials task stays raised. |
-| `recalculateLedger` | `true` after an update from a version with the old gain calculations (transfer fees, sale proceeds, holding period), until Recalculate Ledger runs. |
-| `priceSource`       | `unset` (or absent): BitcoinTX's Settings decide. `off`, `public` or `mempool`: set by Price Source & Privacy and passed as `BTCTX_PRICE_SOURCE`. |
+| `recalculateLedger` | `true` after an update from a version with old gain calculations (transfer fees, sale proceeds and the holding period; a spend's network fee counted twice), until Recalculate Ledger runs. |
+| `priceSource`       | Absent: never chosen (the action preselects nothing). `unset`: Decide in BitcoinTX, the app's own card decides. `off` (Nobody), `public` or `mempool`: set by Price Source & Privacy and passed as `BTCTX_PRICE_SOURCE`. |
 | `mempoolFallback`   | With `mempool`: ask public sites when Mempool can't answer (`BTCTX_MEMPOOL_FALLBACK`). |
-| `useTor`            | Public sites through Tor's SOCKS proxy (`BTCTX_PROXY_URL`), when public sites may be asked. |
+| `useTor`            | Public sites through Tor's SOCKS proxy (`BTCTX_PROXY_URL`), when public sites may be asked; with `unset` (Decide in BitcoinTX), StartOS's Tor lent to the app's own choice (`BTCTX_TOR_PROXY_URL`, shown in the app as Tor on this server, locked on). Either way Tor becomes a dependency. |
 | `checkDefaultLogin` | Set by the update that introduced generated passwords; the next init replaces a login still on `admin` / `password`, then clears it. |
-| `priceSourceTask`   | Set by the update that introduced Price Source & Privacy; the next init raises its optional task (unless a source was already chosen), then clears it. |
+| `priceSourceTask`   | Set by the update that introduced Price Source & Privacy. No longer read or written. |
+| `priceSourceAsked`  | Set once the package has asked for a price choice (the critical task at install, or the important one after an update), so it asks only once (see [Tasks](#tasks)). |
 
 ## Dependencies
 
@@ -89,13 +91,13 @@ Two, both optional (`dependencies.ts`). The manifest lists both; each one's `ena
 | Dependency | When                                                         | Requirement                                   | Reached at |
 | ---------- | ------------------------------------------------------------ | --------------------------------------------- | ---------- |
 | `mempool`  | Price source **My Mempool on this server**                   | running, the minimum version in `dependencies.ts`, health check `webui` | `http://<bridge>` from `sdk.host.getBridgeAddress` (host `main`, port 8080, `ssl: false`); its `/api/v1/prices`, `/api/blocks/tip/height`, `/api/v1/historical-price` |
-| `tor`      | **Reach public price sites over Tor**, with public sites or the fallback | running, the minimum version in `dependencies.ts`, health check `tor` | `socks5h://<bridge>` (host `socks`, port 9050, `fallbackPort: 9050`) |
+| `tor`      | **Use Tor**, with public sites, the fallback, or Decide in BitcoinTX | running, the minimum version in `dependencies.ts`, health check `tor` | `socks5h://<bridge>` (host `socks`, port 9050, `fallbackPort: 9050`): `BTCTX_PROXY_URL` for a choice made here, `BTCTX_TOR_PROXY_URL` for the app's own choice (locked on in its card; an invalid value asks nobody) |
 
 The bridge address (`10.0.3.1:<assigned port>`) is plain HTTP inside StartOS: no certificate to trust and no LAN address that can change. `main.ts` reads both with `.const()`, so installing, removing or re-binding a dependency restarts BitcoinTX with the new address. While Mempool is missing, `BTCTX_MEMPOOL_URL` is left out and the app answers price requests with "install and start Mempool" (or asks public sites if the fallback is on). Tor's address falls back to its fixed port, so without Tor those requests fail instead of going out directly.
 
 ## Network Access and Interfaces
 
-One HTTP port with two interfaces. StartOS terminates TLS; the app serves plain HTTP on port 80 inside the container. BitcoinTX makes no outbound request until the owner chooses a price source (the Price Source & Privacy action, or the app's **Settings → Privacy & Network**, which asks at first login unless the action set it): their own mempool server (live price `/api/v1/prices`, block height, past prices from `/api/v1/historical-price`, keeping hourly 00:00 UTC rows), public sites, or off. Public sites: live price from Kraken or CoinGecko, block height from Blockchain.info, Blockstream or mempool.space, and past daily prices from one download of the whole history in fixed blocks (Bitstamp, else Coinbase), then only the latest days (Bitstamp, Kraken or Coinbase). No request names a transaction date. With a mempool server, the public sites are asked only if the owner turns on the fallback. Tor (the action's toggle, or a proxy set in the app) can carry requests to public sites; the service's outbound traffic can also go through a VPN with StartOS's **Set Outbound Gateway**. The log names the source of each past-price download ("Price history from your mempool server: N days", "BTC price history from public site …").
+One HTTP port with two interfaces. StartOS terminates TLS; the app serves plain HTTP on port 80 inside the container. BitcoinTX makes no outbound request until the owner chooses a price source (the Price Source & Privacy action, or the app's **Settings → Privacy & Network** card, which asks on its Dashboard unless the action set it; a choice the app stored before it kept a record of when it was made is asked once to confirm, and nothing is sent until then): their own mempool server (live price `/api/v1/prices`, block height, past prices from `/api/v1/historical-price`, its live hourly rows), public sites, or nobody. With a choice that allows public sites, the hourly history (Bitstamp's hourly opens from 2013, in fixed 1,000-hour blocks) is downloaded once and each year checked against the fingerprints in `backend/assets/btc_prices/MANIFEST.csv`. Public sites: live price from Kraken, else Bitstamp; block height from Blockchain.info, Blockstream or mempool.space; and past daily prices from one download of Bitstamp's whole history in fixed blocks, then only the latest days (Bitstamp, else Kraken). No request names a transaction date. With a mempool server, the public sites are asked only if the owner turns on the fallback. Tor (the action's Use Tor, or a proxy set in the app) can carry requests to public sites; the service's outbound traffic can also go through a VPN with StartOS's **Set Outbound Gateway**. The log names the source of each past-price download ("Price history from your mempool server: N days", "BTC price history from public site …").
 
 | Interface | Id      | Type | Port | Path   | Description                                          |
 | --------- | ------- | ---- | ---- | ------ | ---------------------------------------------------- |
@@ -108,7 +110,7 @@ Both are on the `ui-multi` host, so a domain added to one is available to both. 
 
 The package, not the app's first-run page, creates the login: the service cannot start until it exists.
 
-1. Install creates nothing in the app. A **critical** task points at Set Login Credentials, and an **important** one at Price Source & Privacy — see [Tasks](#tasks).
+1. Install creates nothing in the app. A **critical** task points at Set Login Credentials, then a second **critical** one at Price Source & Privacy: the service starts once both have run — see [Tasks](#tasks).
 2. Set Login Credentials runs `set-password` in a temporary subcontainer, which creates and migrates the database and sets `admin` / a random 24-character password, stores the password in `store.json` and shows it once.
 3. Because the login is no longer the app's shipped default (`admin` / `password`), the app's first-run registration page never appears.
 
@@ -124,7 +126,7 @@ Only while stopped. Sets the username to `admin` and a new random password throu
 
 ### Price Source & Privacy
 
-A form (prefilled from `store.json`): **Price source** (My Mempool on this server / Public price sites / Off / Choose in BitcoinTX), **Fall back to public price sites**, **Reach public price sites over Tor**. Saves to `store.json` and clears its task; `main.ts` and `dependencies.ts` watch those keys, so the service restarts with the new `BTCTX_*` variables and dependencies. "Choose in BitcoinTX" (`unset`) passes nothing and the app's own Settings decide again. Resolves "no prices" (Mempool not installed or not running: install/start it, or turn on the fallback) and "the public sites see my IP" (Tor or Set Outbound Gateway).
+A form (prefilled from `store.json`; nothing preselected until a choice was made): **Newer prices from**, a `Value.dynamicSelect` (My Mempool on this server, labelled "recommended: installed" when StartOS has Mempool's bridge address / Public price sites / Nobody: fully offline / Decide in BitcoinTX instead), **If Mempool can't answer, ask public price sites**, **Use Tor (the Tor service on this server)**. Its description says the hourly history is downloaded once from Bitstamp, checked against the fingerprints shipped with this version, when the choice allows public sites. Saves to `store.json` and clears its task; `main.ts` and `dependencies.ts` watch those keys, so the service restarts with the new `BTCTX_*` variables and dependencies. "Decide in BitcoinTX instead" (`unset`) passes no price choice and the app's own card decides: what was chosen there, or, if nothing was, the app asks; with Use Tor it passes `BTCTX_TOR_PROXY_URL`, Tor on this server for the app's own choice. Resolves "no prices" (Mempool not installed or not running: install/start it, or turn on the fallback) and "the public sites see my IP" (Use Tor or Set Outbound Gateway).
 
 ### Connect an AI Assistant
 
@@ -141,13 +143,13 @@ Three actions raise tasks.
 | Task                   | Severity    | Raised when                                        | Cleared when                     |
 | ---------------------- | ----------- | -------------------------------------------------- | -------------------------------- |
 | Set Login Credentials  | `critical`  | While no password is stored (at install, and after an update from an install whose login was set in the app); after an update locked a default login | The action runs |
-| Price Source & Privacy | `important` | At install                                         | The action runs                  |
-| Price Source & Privacy | `optional`  | Once, after updating (or restoring a backup) from before this action existed, without a choice made here | The action runs, or dismissed |
+| Price Source & Privacy | `critical`  | At install, after Set Login Credentials (init order) | The action runs: any choice, Nobody and Decide in BitcoinTX included |
+| Price Source & Privacy | `important` | Once, after an update or a restore of an install that was never asked and has no choice made here (never critical: a running service never stops) | The action runs, or dismissed |
 | Recalculate Ledger     | `important` | After updating (or restoring a backup) from a version with the old gain calculations | The action runs |
 
-The critical task blocks starting the service until the login exists. The price task does not block: until a source is chosen, the app asks at first login and contacts nothing. The recalculation task does not block: the app works, but gains computed the old way (transfer fees, sale proceeds, holding period) stay wrong until a recalculation.
+The critical tasks block starting the service until the login exists and a price choice is made (Start9's `tasks.md`: critical is for essential setup such as selecting a backend). Both keep the replay key they always had, so nothing is retired. After an update or a restore the price task does not block: until a source is chosen, the app asks on its Dashboard and contacts nothing. The recalculation task does not block: the app works, but gains computed the old way (transfer fees, sale proceeds, the holding period, a spend's network fee counted twice) stay wrong until a recalculation.
 
-Updating across the change that made a withdrawal's network fee its own disposal (and gave Lost withdrawals no gain or loss) raises no task, but the next recalculation (or any add, edit or delete) changes those figures. **Settings → Ledger Review** in the app lists them beforehand.
+Updating across the change that made a withdrawal's network fee its own disposal (and gave Lost withdrawals no gain or loss) raises no task, but the next recalculation (an edit or a deletion recalculates too) changes those figures. Updating across the one that takes a spend's network fee off its proceeds raises the Recalculate Ledger task. **Settings → Ledger Review** in the app lists the changed figures beforehand.
 
 ## Health Checks
 
@@ -163,7 +165,7 @@ One check, on the `webui` daemon.
 
 Both volumes are copied whole (`sdk.Backups.ofVolumes('main', 'startos')`). StartOS stops the service first, so the SQLite file is copied at rest; there is no dump step.
 
-- **Included:** the database, the session key, the app's copies in `backups/`, and `store.json`.
+- **Included:** the database, the session key, the hourly price history in `btc-prices/`, the app's copies in `backups/`, and `store.json`.
 - **Restore:** complete, including the generated password. A backup taken on an older package version is migrated forward on restore like an update (including the Recalculate Ledger task when it predates the gain-calculation fixes).
 - **Address after a restore:** a restore is a fresh install, so StartOS may assign the web UI and MCP API a new port (ports are kept across restarts and updates, released on uninstall). Rerun **Connect an AI Assistant** and update the AI client's `BTCTX_URL`.
 - The app also has its own password-encrypted database export (Settings in the web UI), independent of StartOS backups. Restoring one of those in the app brings back the ledger and its other settings but keeps the login, the AI key and the price settings in use.
@@ -177,7 +179,8 @@ BitcoinTX on StartOS is the same app as on Docker; these are the differences and
 3. **The MCP server is not hosted here.** It runs on the user's computer and connects to the MCP API address.
 4. **No riscv64 build.**
 5. **English and US taxes only.** The app's interface is in English and it produces US (IRS) tax forms. The store listing, release notes, actions and tasks are translated (Spanish, German, Polish, French); they name the app's own screens in English.
-6. **Prices set in the action are read-only in the app.** Choose **Choose in BitcoinTX** in the action to manage them in the app again (for example for a mempool server on another machine, or your own proxy).
+6. **Prices set in the action are read-only in the app.** Choose **Decide in BitcoinTX instead** in the action to manage them in the app again (for example for a mempool server on another machine, or your own proxy); with **Use Tor** on, the app uses this server's Tor, locked on. For a mempool at another home server's `https://` address (`.local`, `.lan`, a one-word name, or 10.x, 172.16–31.x or 192.168.x), the app's card offers **Trust this server** once a request fails on that server's certificate; it pins that server's root certificate for that address only (never for public sites). From inside StartOS, another server's `.local` name resolves only if the network's DNS answers it: the service's resolver (10.0.3.1) forwards names it doesn't serve to the network's DNS, and the container has no mDNS. Use that server's LAN IP address instead (its Interfaces tab lists it); StartOS's certificate covers the address the client connects to.
+7. **Bitstamp refuses requests through Tor** (403, or its "Loading" challenge). With **Use Tor** (Public price sites, or My Mempool's public backup), the hourly history download and every past price from Bitstamp fail, safely: no request goes direct and no value becomes $0. Only the live price works (Kraken). The app's card says "Through Tor, Bitstamp currently refuses…" (`history.refused` in `GET /api/bitcoin/price/status`). Resolves "no past prices with Tor": choose Public price sites without Tor to download them (a checked hourly history stays, whatever the choice later; it ends at the release's last hour), use My Mempool on this server for newer values, or type them.
 
 ---
 
@@ -206,6 +209,8 @@ startos_managed_env_vars:
   - BTCTX_MEMPOOL_URL # http://<bridge>, left out while Mempool is missing
   - BTCTX_MEMPOOL_FALLBACK
   - BTCTX_PROXY_URL # socks5h://<bridge>:9050 with Tor
+  - BTCTX_TOR_PROXY_URL # with Decide in BitcoinTX instead + Use Tor
+  - BTCTX_HOST # startos
 dependencies: # both optional, only while chosen
   mempool: { kind: running, health: webui, host: main, port: 8080 }
   tor: { kind: running, health: tor, host: socks, port: 9050 }
@@ -219,7 +224,7 @@ actions:
   - set-credentials
 tasks:
   - { action: set-credentials, severity: critical }
-  - { action: price-source, severity: important } # install; optional after update
+  - { action: price-source, severity: critical } # install; important once after an update or restore never asked, without a choice
   - { action: recalculate-ledger, severity: important }
 health_checks:
   - webui # GET /api/health == 200
