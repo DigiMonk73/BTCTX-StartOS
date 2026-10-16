@@ -35,7 +35,7 @@ const dict = {
   'Ledger Recalculated': 27,
 
   // init/recalculateTask.ts
-  'This update corrects how transfer fees, sale proceeds and the one-year holding period are calculated. Recalculate once so the corrections reach your existing transactions.': 40,
+  'This update corrects how some gains are calculated. To see which figures change, open Settings > Ledger Review in BitcoinTX first; then recalculate once so the corrections reach your existing transactions.': 40,
 
   // AI key (interfaces.ts, actions/connectAi.ts)
   'The address for AI assistants (MCP clients), which use an AI key you create in BitcoinTX Settings, never your password. Optional: nothing uses it until you set up an AI app. Run the Connect an AI Assistant action for a ready-made configuration.': 41,
@@ -44,28 +44,30 @@ const dict = {
   'Then paste the Claude Desktop configuration into Settings > Developer > Edit Config (or mcp.json in LM Studio) and replace ${placeholder} with your AI key. The Claude Code command works too, but keeps the key in your shell history, so prefer the configuration file.': 44,
 
   // actions/priceSource.ts
-  'Price source': 46,
-  "Where BitcoinTX gets the Bitcoin price, the block height and past prices. Your ledger itself is never sent anywhere.\n- My Mempool on this server: asks your Mempool service, which must be installed and running.\n- Public price sites: asks Kraken, CoinGecko, Blockchain.info, Blockstream, mempool.space, Bitstamp and Coinbase. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Off: BitcoinTX contacts nothing. Prices it already stored still work; type any other USD value in yourself.\n- Choose in BitcoinTX: the app's own Settings > Privacy & Network decide.": 47,
+  'Newer prices from': 46,
+  "BitcoinTX's hourly price history (2013 on) is downloaded once from Bitstamp, checked against fingerprints that come with this version, when your choice allows public price sites. Your ledger is never sent anywhere.\n- My Mempool on this server: the most private; asks your Mempool service, which must be installed and running. It has hourly prices only from when it began recording: for older values, turn on the option below that asks public price sites when Mempool can't answer, or type them.\n- Public price sites: Bitstamp and Kraken for prices; Blockchain.info, Blockstream or mempool.space for the block height. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Nobody: fully offline. Prices BitcoinTX already has still work; type newer values yourself.\n- Decide in BitcoinTX instead: the app's own Settings > Privacy & Network decide, for example for a Mempool on another machine.": 47,
   'My Mempool on this server': 48,
+  'My Mempool on this server (recommended: installed)': 74,
   'Public price sites': 49,
-  'Off: contact nothing': 50,
-  'Choose in BitcoinTX (Settings > Privacy & Network)': 51,
-  'Fall back to public price sites': 52,
-  "With My Mempool: when it doesn't answer, or doesn't have a past day's price, ask the public sites instead. Off: nothing goes to a public site.": 53,
-  'Reach public price sites over Tor': 54,
-  'Needs the Tor service on this server. The public sites then never see your IP address. Used with Public price sites, or with the fallback on.': 55,
+  'Nobody: fully offline': 50,
+  'Decide in BitcoinTX instead': 51,
+  "If Mempool can't answer, ask public price sites": 52,
+  "With My Mempool: when it doesn't answer, or has no price for an hour, ask public price sites instead; the hourly history is then downloaded once from Bitstamp. Off: nothing goes to a public site.": 53,
+  'Use Tor (the Tor service on this server)': 54,
+  "Needs the Tor service on this server. Public price sites then never see your IP address. Used with Public price sites, with My Mempool when it may ask public price sites, and with Decide in BitcoinTX instead, where BitcoinTX shows it as Tor on this server. Through Tor, Bitstamp currently refuses BitcoinTX's requests, so the hourly history and past prices don't download; only the live price works. Choose Public price sites without Tor to download them (once checked, the hourly history stays), use My Mempool on this server for newer values, or type them.": 55,
   'Price Source & Privacy': 56,
-  'Choose where BitcoinTX gets Bitcoin prices: your own Mempool on this server, public price sites (optionally over Tor), or nothing at all.': 57,
-  'BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no prices unless the fallback is on.': 58,
+  'Choose who BitcoinTX asks for newer Bitcoin prices: your own Mempool on this server, public price sites (optionally over Tor), nobody, or decide in BitcoinTX.': 57,
+  "BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no newer prices, unless it may ask public price sites when Mempool can't answer.": 58,
   'BitcoinTX restarts and asks the public price sites.': 59,
   'BitcoinTX restarts and contacts nothing. Prices it already stored still work; for anything else, type the USD value in.': 60,
   "BitcoinTX's own Settings > Privacy & Network decide again. It restarts if it was set here before.": 61,
   'Public sites are reached over Tor: install and start the Tor service if it is not running, or those requests fail.': 62,
   'Price Source Saved': 63,
+  "BitcoinTX's own choice can use the Tor service on this server: install and start it if it is not running.": 75,
 
   // init/priceSourceTask.ts
-  'Choose where BitcoinTX gets Bitcoin prices: your own Mempool, public sites (optionally over Tor), or nothing.': 64,
-  'New: choose here where BitcoinTX gets Bitcoin prices. My Mempool on this server now works directly, without an https address.': 65,
+  'Choose who BitcoinTX asks for newer Bitcoin prices, or nobody': 64,
+  'Prices are now hourly. Check who BitcoinTX asks for newer ones.': 65,
 
   // actions/setCredentials.ts, init/watchCredentials.ts, init/defaultLogin.ts
   'This replaces your current username and password. Your transactions are not touched.': 30,

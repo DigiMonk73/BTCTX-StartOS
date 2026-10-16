@@ -42,6 +42,11 @@ Branches (BTCTX-MCP's `AGENTS.md`, "Branches"): work reaches `develop` by pull r
    - `dockerTag` in `startos/startos/manifest/index.ts`:
      `ghcr.io/digimonk73/btctx-mcp:v<VERSION>`
    - the package version (next section)
+
+   In the same pull request, run `make prices` (online): it adds the hourly
+   price history's new hours to `backend/assets/btc_prices/MANIFEST.csv`,
+   cross-checked against a second exchange (that folder's README). The
+   release refuses a history that ends more than 14 days before it.
 2. Move the `## [Unreleased]` section of `docs/CHANGELOG.md` to
    `## [vX.Y.Z] - <date> - <summary>`, and remove the ticked items from
    `docs/ROADMAP.md` (the CHANGELOG has them now).
@@ -59,7 +64,9 @@ Branches (BTCTX-MCP's `AGENTS.md`, "Branches"): work reaches `develop` by pull r
    then builds the image (if `main` hasn't yet), the macOS `.dmg` and `.zip`
    and `btctx.s9pk`, creates the tag and one GitHub release with all three
    (titled `vX.Y.Z · StartOS package X.Y.Z:N`, the version StartOS and the
-   mirror show), publishes the AI connector to PyPI (`btctx-mcp==X.Y.Z`,
+   mirror show) and their `SHA256SUMS`, with a GitHub build provenance
+   attestation of each (`gh attestation verify <file> -R DigiMonk73/BTCTX-MCP`),
+   publishes the AI connector to PyPI (`btctx-mcp==X.Y.Z`,
    not for `-N` revisions), and pushes `startos/` to BTCTX-StartOS's `main`
    (when `MIRROR_TOKEN` exists). There, Start9's **Tag and Release** workflow
    tags it `v<upstream>_<revision>` and creates the release with its own

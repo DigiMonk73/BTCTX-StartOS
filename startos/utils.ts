@@ -9,6 +9,8 @@ export const ADMIN_USERNAME = 'admin'
 export const appEnv = {
   DATABASE_FILE: '/data/btctx.db',
   LOG_LEVEL: 'INFO',
+  // Where BitcoinTX runs: its words name StartOS's action (#145)
+  BTCTX_HOST: 'startos',
 }
 
 /** The `main` volume at /data, as the app expects it. */
