@@ -2,10 +2,12 @@ import { setCredentials } from '../actions/setCredentials'
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { generatePassword, replaceDefaultLogin } from '../utils'
+import { generatePassword, lastWords, replaceDefaultLogin } from '../utils'
 
 /**
- * Once after an update (or restore) from before 1.2.0: installs from before
+ * Once after an update from before 1.2.0 (a backup from before then is
+ * restored as its own version, and does this at its next update, #323):
+ * installs from before
  * generated passwords may still have the app's default login, which BitcoinTX
  * 1.1.0 and later accept only with the setup code from the service log.
  * Lock it with a password nobody sees, and make Set Login Credentials the
@@ -21,9 +23,10 @@ export const defaultLogin = sdk.setupOnInit(async (effects) => {
   } catch (e) {
     // Never fail the update or restore over this: the flag stays, so the
     // next start tries again (and main's migrate step shows a real problem).
+    // Its own words only: the SDK's report can carry the SQL's values (#465)
     console.error(
       'Checking for the default login failed; retrying next start:',
-      e,
+      lastWords(e),
     )
     return
   }

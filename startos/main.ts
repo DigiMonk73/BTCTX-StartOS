@@ -43,35 +43,31 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   return (
     sdk.Daemons.of(effects)
-      // Schema upgrade (with a copy of the database in /data/backups first)
-      // as its own step, before the web server.
+      // Both steps run the image's own start-up script, docker-entrypoint.sh
+      // (main.md, "Using Upstream Entrypoint"), as root, the image's user: it
+      // gives /data to btctx only when something in it isn't btctx's (volumes
+      // from before 1.2.9 are root's), then runs the command as btctx keeping
+      // only the right to open port 80, which an ordinary user may not in
+      // StartOS's container (net.ipv4.ip_unprivileged_port_start is 1024).
+      // First the schema upgrade (with a copy of the database in
+      // /data/backups first), as its own step, before the web server.
       .addOneshot('migrate', {
         subcontainer: app,
         exec: {
-          command: ['python', '-m', 'backend.cli', 'migrate'],
-          cwd: '/app',
+          command: sdk.useEntrypoint([
+            'python',
+            '-m',
+            'backend.cli',
+            'migrate',
+          ]),
           env,
         },
         requires: [],
       })
       .addDaemon('webui', {
         subcontainer: app,
-        exec: {
-          command: [
-            'uvicorn',
-            'backend.main:app',
-            '--host',
-            '0.0.0.0',
-            '--port',
-            String(uiPort),
-            // Request lines carry client addresses and dates (?date=...)
-            '--no-access-log',
-            // No "server: uvicorn" header on the responses
-            '--no-server-header',
-          ],
-          cwd: '/app',
-          env,
-        },
+        // The image's CMD (the Dockerfile): the web server on port 80
+        exec: { command: sdk.useEntrypoint(), env },
         ready: {
           display: i18n('Web Interface'),
           gracePeriod: 30_000,

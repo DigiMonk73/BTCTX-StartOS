@@ -41,13 +41,13 @@ export const mempoolDescription = {
 
 export const torDescription = {
   en_US:
-    'Optional: carries requests to public price sites when you turn on Tor in Price Source & Privacy, so they never see your IP address',
+    "Optional: carries requests to public price sites when you turn on Tor in Price Source & Privacy, so they don't see your IP address, unless you let BitcoinTX download Bitstamp's price history without Tor",
   es_ES:
-    'Opcional: transporta las solicitudes a los sitios públicos de precios si activas Tor en Fuente de precios y privacidad, para que nunca vean tu dirección IP',
+    'Opcional: transporta las solicitudes a los sitios públicos de precios si activas Tor en Fuente de precios y privacidad, para que no vean tu dirección IP, salvo que permitas que BitcoinTX descargue el historial de precios de Bitstamp sin Tor',
   de_DE:
-    'Optional: leitet Anfragen an öffentliche Kursseiten weiter, wenn du Tor unter Kursquelle & Datenschutz einschaltest, sodass sie nie deine IP-Adresse sehen',
+    'Optional: leitet Anfragen an öffentliche Kursseiten weiter, wenn du Tor unter Kursquelle & Datenschutz einschaltest, sodass sie deine IP-Adresse nicht sehen, außer du lässt BitcoinTX den Preisverlauf von Bitstamp ohne Tor herunterladen',
   pl_PL:
-    'Opcjonalnie: przekazuje zapytania do publicznych serwisów z cenami, gdy włączysz Tor w Źródło cen i prywatność, więc nigdy nie widzą Twojego adresu IP',
+    'Opcjonalnie: przekazuje zapytania do publicznych serwisów z cenami, gdy włączysz Tor w Źródło cen i prywatność, więc nie widzą Twojego adresu IP, chyba że pozwolisz BitcoinTX pobrać historię cen z Bitstampu bez Tora',
   fr_FR:
-    'Facultatif : achemine les requêtes vers les sites publics de prix quand vous activez Tor dans Source des prix et confidentialité, pour qu’ils ne voient jamais votre adresse IP',
+    'Facultatif : achemine les requêtes vers les sites publics de prix quand vous activez Tor dans Source des prix et confidentialité, pour qu’ils ne voient pas votre adresse IP, sauf si vous laissez BitcoinTX télécharger l’historique des prix de Bitstamp sans Tor',
 }
