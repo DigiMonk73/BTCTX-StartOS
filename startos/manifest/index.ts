@@ -8,7 +8,7 @@ export const manifest = setupManifest({
   packageRepo: 'https://github.com/Start9-Community/BTCTX-StartOS',
   upstreamRepo: 'https://github.com/DigiMonk73/BTCTX-MCP',
   marketingUrl: 'https://digimonk73.github.io/btctx-site/',
-  donationUrl: null,
+  donationUrl: 'https://strike.me/@digimonk73',
   description: { short, long },
   // main: the app's data at /data. startos: this package's store.json, never
   // mounted into the app.
@@ -18,7 +18,7 @@ export const manifest = setupManifest({
       source: {
         // Must be v<VERSION> of the repository root (checked by
         // backend/tests/test_versions_agree.py); published by image.yml.
-        dockerTag: 'ghcr.io/digimonk73/btctx-mcp:v1.2.8',
+        dockerTag: 'ghcr.io/digimonk73/btctx-mcp:v1.2.9',
       },
       arch: ['x86_64', 'aarch64'],
     },

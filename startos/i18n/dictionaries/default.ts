@@ -35,7 +35,7 @@ const dict = {
   'Ledger Recalculated': 27,
 
   // init/recalculateTask.ts
-  'This update corrects how some gains are calculated. To see which figures change, open Settings > Ledger Review in BitcoinTX first; then recalculate once so the corrections reach your existing transactions.': 40,
+  'An update corrected how some gains are calculated. To see which figures change, open Settings > Ledger Review in BitcoinTX first; then run the Recalculate Ledger action here once so the corrections reach your existing transactions.': 40,
 
   // AI key (interfaces.ts, actions/connectAi.ts)
   'The address for AI assistants (MCP clients), which use an AI key you create in BitcoinTX Settings, never your password. Optional: nothing uses it until you set up an AI app. Run the Connect an AI Assistant action for a ready-made configuration.': 41,
@@ -45,19 +45,19 @@ const dict = {
 
   // actions/priceSource.ts
   'Newer prices from': 46,
-  "BitcoinTX's hourly price history (2013 on) is downloaded once from Bitstamp, checked against fingerprints that come with this version, when your choice allows public price sites. Your ledger is never sent anywhere.\n- My Mempool on this server: the most private; asks your Mempool service, which must be installed and running. It has hourly prices only from when it began recording: for older values, turn on the option below that asks public price sites when Mempool can't answer, or type them.\n- Public price sites: Bitstamp and Kraken for prices; Blockchain.info, Blockstream or mempool.space for the block height. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Nobody: fully offline. Prices BitcoinTX already has still work; type newer values yourself.\n- Decide in BitcoinTX instead: the app's own Settings > Privacy & Network decide, for example for a Mempool on another machine.": 47,
-  'My Mempool on this server': 48,
-  'My Mempool on this server (recommended: installed)': 74,
+  "BitcoinTX's hourly price history (2013 on) is downloaded once from Bitstamp, checked against fingerprints that come with this version, when your choice allows public price sites. Your ledger is never sent anywhere.\n- My Mempool on this server: the most private; asks the Mempool service installed on this server, which must be running. It has hourly prices only from when it began recording: for older values, turn on the option below that asks public price sites when Mempool can't answer, or type them.\n- Public price sites: Bitstamp and Kraken for prices; Blockchain.info, Blockstream or mempool.space for the block height. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Nobody: fully offline. Prices BitcoinTX already has still work; type newer values yourself.\n- Decide in BitcoinTX instead: the app's own Settings > Privacy & Network decide. Choose it also for a Mempool on another machine, and type its address there.": 47,
+  'My Mempool on this server (install Mempool here first)': 48,
+  'My Mempool on this server (installed here, recommended)': 74,
   'Public price sites': 49,
   'Nobody: fully offline': 50,
-  'Decide in BitcoinTX instead': 51,
+  'Decide in BitcoinTX instead (also for a Mempool on another machine)': 51,
   "If Mempool can't answer, ask public price sites": 52,
   "With My Mempool: when it doesn't answer, or has no price for an hour, ask public price sites instead; the hourly history is then downloaded once from Bitstamp. Off: nothing goes to a public site.": 53,
   'Use Tor (the Tor service on this server)': 54,
-  "Needs the Tor service on this server. Public price sites then never see your IP address. Used with Public price sites, with My Mempool when it may ask public price sites, and with Decide in BitcoinTX instead, where BitcoinTX shows it as Tor on this server. Through Tor, Bitstamp currently refuses BitcoinTX's requests, so the hourly history and past prices don't download; only the live price works. Choose Public price sites without Tor to download them (once checked, the hourly history stays), use My Mempool on this server for newer values, or type them.": 55,
+  "Needs the Tor service on this server. Public price sites then never see your IP address, unless you let BitcoinTX download Bitstamp's price history without Tor. Used with Public price sites, with My Mempool when it may ask public price sites, and with Decide in BitcoinTX instead, where BitcoinTX shows it as Tor on this server. Through Tor, Bitstamp currently refuses BitcoinTX's requests for the price history, so BitcoinTX's Dashboard asks once whether to download it without Tor: only Bitstamp's history downloads, the same for every install and naming none of your dates; the live price stays on Tor. You can change the answer in Settings > Privacy & Network. With No, use My Mempool on this server for newer values, or type them.": 55,
   'Price Source & Privacy': 56,
   'Choose who BitcoinTX asks for newer Bitcoin prices: your own Mempool on this server, public price sites (optionally over Tor), nobody, or decide in BitcoinTX.': 57,
-  "BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no newer prices, unless it may ask public price sites when Mempool can't answer.": 58,
+  "BitcoinTX restarts and asks the Mempool service on this server. If Mempool is not installed here yet, install and start it: until then BitcoinTX has no newer prices, unless it may ask public price sites when Mempool can't answer.": 58,
   'BitcoinTX restarts and asks the public price sites.': 59,
   'BitcoinTX restarts and contacts nothing. Prices it already stored still work; for anything else, type the USD value in.': 60,
   "BitcoinTX's own Settings > Privacy & Network decide again. It restarts if it was set here before.": 61,
@@ -77,9 +77,11 @@ const dict = {
   'Log in to BitcoinTX with these and keep them somewhere safe: they are shown only now. If you lose them, run this action again.': 70,
   'Create your BitcoinTX login before starting the service': 71,
   'Your BitcoinTX login was still the original admin / password, so it has been locked. Set a new login before starting the service.': 72,
+  'BitcoinTX could not set the password: ${detail}': 76,
 
   // actions/recalculateLedger.ts
   'Transactions recalculated: ${count}': 73,
+  'BitcoinTX could not recalculate the ledger: ${detail}': 77,
 } as const
 
 /**

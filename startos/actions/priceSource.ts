@@ -17,16 +17,18 @@ const inputSpec = InputSpec.of({
     return {
       name: i18n('Newer prices from'),
       description: i18n(
-        "BitcoinTX's hourly price history (2013 on) is downloaded once from Bitstamp, checked against fingerprints that come with this version, when your choice allows public price sites. Your ledger is never sent anywhere.\n- My Mempool on this server: the most private; asks your Mempool service, which must be installed and running. It has hourly prices only from when it began recording: for older values, turn on the option below that asks public price sites when Mempool can't answer, or type them.\n- Public price sites: Bitstamp and Kraken for prices; Blockchain.info, Blockstream or mempool.space for the block height. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Nobody: fully offline. Prices BitcoinTX already has still work; type newer values yourself.\n- Decide in BitcoinTX instead: the app's own Settings > Privacy & Network decide, for example for a Mempool on another machine.",
+        "BitcoinTX's hourly price history (2013 on) is downloaded once from Bitstamp, checked against fingerprints that come with this version, when your choice allows public price sites. Your ledger is never sent anywhere.\n- My Mempool on this server: the most private; asks the Mempool service installed on this server, which must be running. It has hourly prices only from when it began recording: for older values, turn on the option below that asks public price sites when Mempool can't answer, or type them.\n- Public price sites: Bitstamp and Kraken for prices; Blockchain.info, Blockstream or mempool.space for the block height. They see your IP address and when BitcoinTX is open, never your transaction dates.\n- Nobody: fully offline. Prices BitcoinTX already has still work; type newer values yourself.\n- Decide in BitcoinTX instead: the app's own Settings > Privacy & Network decide. Choose it also for a Mempool on another machine, and type its address there.",
       ),
       default: stored ?? null,
       values: {
         mempool: installed
-          ? i18n('My Mempool on this server (recommended: installed)')
-          : i18n('My Mempool on this server'),
+          ? i18n('My Mempool on this server (installed here, recommended)')
+          : i18n('My Mempool on this server (install Mempool here first)'),
         public: i18n('Public price sites'),
         off: i18n('Nobody: fully offline'),
-        unset: i18n('Decide in BitcoinTX instead'),
+        unset: i18n(
+          'Decide in BitcoinTX instead (also for a Mempool on another machine)',
+        ),
       },
     }
   }),
@@ -40,7 +42,7 @@ const inputSpec = InputSpec.of({
   tor: Value.toggle({
     name: i18n('Use Tor (the Tor service on this server)'),
     description: i18n(
-      "Needs the Tor service on this server. Public price sites then never see your IP address. Used with Public price sites, with My Mempool when it may ask public price sites, and with Decide in BitcoinTX instead, where BitcoinTX shows it as Tor on this server. Through Tor, Bitstamp currently refuses BitcoinTX's requests, so the hourly history and past prices don't download; only the live price works. Choose Public price sites without Tor to download them (once checked, the hourly history stays), use My Mempool on this server for newer values, or type them.",
+      "Needs the Tor service on this server. Public price sites then never see your IP address, unless you let BitcoinTX download Bitstamp's price history without Tor. Used with Public price sites, with My Mempool when it may ask public price sites, and with Decide in BitcoinTX instead, where BitcoinTX shows it as Tor on this server. Through Tor, Bitstamp currently refuses BitcoinTX's requests for the price history, so BitcoinTX's Dashboard asks once whether to download it without Tor: only Bitstamp's history downloads, the same for every install and naming none of your dates; the live price stays on Tor. You can change the answer in Settings > Privacy & Network. With No, use My Mempool on this server for newer values, or type them.",
     ),
     default: false,
   }),
@@ -86,7 +88,7 @@ export const priceSource = sdk.Action.withInput(
       (input.source === 'mempool' && input.fallback)
     const messages = {
       mempool: i18n(
-        "BitcoinTX restarts and asks your Mempool service. If Mempool is not installed yet, install and start it: until then BitcoinTX has no newer prices, unless it may ask public price sites when Mempool can't answer.",
+        "BitcoinTX restarts and asks the Mempool service on this server. If Mempool is not installed here yet, install and start it: until then BitcoinTX has no newer prices, unless it may ask public price sites when Mempool can't answer.",
       ),
       public: i18n('BitcoinTX restarts and asks the public price sites.'),
       off: i18n(

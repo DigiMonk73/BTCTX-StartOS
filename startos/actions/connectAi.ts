@@ -23,12 +23,14 @@ async function mcpUrls(effects: T.Effects): Promise<string[]> {
   return [...new Set(hostnames.map((h) => info.toUrl(h)))]
 }
 
-/** The StartOS root CA (last in the chain), or null if it can't be read. */
+/**
+ * The StartOS root CA, or null if it can't be read. getRootCa is the call for
+ * a certificate to trust; getSslCertificate is for one to serve
+ * (service-to-service.md, "Trusting this server's certificates").
+ */
 async function rootCa(effects: T.Effects): Promise<string | null> {
   try {
-    const [, , root] = await sdk
-      .getSslCertificate(effects, ['127.0.0.1'])
-      .once()
+    const root: string | undefined = await sdk.getRootCa(effects)
     return root?.includes('BEGIN CERTIFICATE') ? root.trim() : null
   } catch (e) {
     console.warn('Connect an AI Assistant: no root CA:', e)

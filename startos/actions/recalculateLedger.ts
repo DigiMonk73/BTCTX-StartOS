@@ -1,7 +1,7 @@
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { runAppCli } from '../utils'
+import { alertOnFailure, runAppCli } from '../utils'
 
 // Kept from 0.8.0, its first use: a task still open from then is the same one.
 export const RECALCULATE_TASK_ID = 'recalculate-after-0.8.0'
@@ -23,7 +23,13 @@ export const recalculateLedger = sdk.Action.withoutInput(
   }),
 
   async ({ effects }) => {
-    const output = await runAppCli(effects, ['recalculate'], { prices: true })
+    const output = await alertOnFailure(
+      runAppCli(effects, ['recalculate'], { prices: true }),
+      (detail) =>
+        i18n('BitcoinTX could not recalculate the ledger: ${detail}', {
+          detail,
+        }),
+    )
     await storeJson.merge(effects, { recalculateLedger: false })
     await sdk.action.clearTask(effects, RECALCULATE_TASK_ID)
 

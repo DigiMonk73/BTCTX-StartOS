@@ -10,9 +10,11 @@ import { sdk } from '../sdk'
  * - at install, a critical task right after Set Login Credentials (init
  *   order): BitcoinTX starts once a choice is made, Nobody and Decide in
  *   BitcoinTX included;
- * - after an update or a restore, never critical, so a running service never
- *   stops: when no choice was ever made in the action and the package never
- *   asked (an install from before hourly prices), an important task, once.
+ * - after an update, never critical, so a running service never stops: when
+ *   no choice was ever made in the action and the package never asked (an
+ *   install from before hourly prices), an important task, once. A restore
+ *   brings back the backup's own version (#323): a backup this version made
+ *   was asked already, and an older one is asked at its next update.
  * The action clears it (same replay key as before: nothing is retired).
  */
 export const priceSourceTask = sdk.setupOnInit(async (effects, kind) => {

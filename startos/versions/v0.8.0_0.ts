@@ -1,5 +1,5 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
-import { storeJson } from '../fileModels/store.json'
+import { makeRecalculationDue } from '../utils'
 
 /**
  * 0.8.0 corrected transfer fees, sale proceeds and the one-year holding
@@ -22,7 +22,7 @@ export const v_0_8_0_0 = VersionInfo.of({
   },
   migrations: {
     up: async ({ effects }) => {
-      await storeJson.merge(effects, { recalculateLedger: true })
+      await makeRecalculationDue(effects)
     },
     down: IMPOSSIBLE,
   },
