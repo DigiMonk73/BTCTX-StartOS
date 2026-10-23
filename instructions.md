@@ -57,7 +57,7 @@ The web UI's **Settings > Connect an AI Assistant** has the key, a setup prompt 
 
 1. In the web UI, **Settings > Connect an AI Assistant**: turn on **Let AI assistants use BitcoinTX** and click **Create AI key**. BitcoinTX shows it once; keep it for step 5.
 2. Run **Connect an AI Assistant**. It shows the MCP address, the certificate your computer needs to trust this server, and a ready-to-paste configuration.
-3. On the computer with your AI client, install [uv](https://docs.astral.sh/uv/).
+3. On the computer with your AI client, install [uv](https://docs.astral.sh/uv/). The connector needs Python 3.11 or newer: if that computer has only Python 3.10, run `uv python install 3.13` once.
 4. Download the certificate from the action (or save it as a file under the name the action tells you) and put its full path in `BTCTX_CA_BUNDLE`.
 5. Paste the **Claude Desktop configuration** into Claude Desktop (**Settings > Developer > Edit Config**) or LM Studio (**Edit mcp.json**), replace `YOUR_BITCOINTX_AI_KEY` with your key, and restart it. The **Claude Code command** works too, but keeps the key in your shell history.
 6. Ask the assistant to add a transaction, for example by pasting an exchange confirmation email. It shows you a preview and saves only after you confirm.
@@ -79,5 +79,5 @@ The connector's version, after `btctx-mcp==` in your AI app's configuration, sho
 
 BitcoinTX is in English and produces US (IRS) tax forms. Beyond that:
 
-- **One wallet and one exchange.** BitcoinTX tracks one self-custody Wallet and one Exchange. Since 2025, IRS rules require cost basis to be figured wallet by wallet and account by account, so if you use several wallets or exchange accounts, BitcoinTX's gains can differ from what the rules give. Keep separate records for each, or ask your tax preparer.
+- **One wallet and one exchange.** BitcoinTX tracks one self-custody Wallet and one Exchange. Since 2025, IRS rules require cost basis to be figured wallet by wallet and account by account, so if you use multiple wallets or exchange accounts, BitcoinTX's gains can differ from what the rules give. Keep separate records for each, or ask your tax preparer.
 - **BitcoinTX cannot be downgraded.** Each update may upgrade the database, and older versions refuse a newer database. BitcoinTX keeps copies of the database from before its last few upgrades in its `backups` folder. To go back, uninstall BitcoinTX, which deletes its data (those copies too), then restore a StartOS backup made before the update. Anything you entered after that backup is lost.
