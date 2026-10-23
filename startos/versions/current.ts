@@ -41,6 +41,7 @@ export const current = VersionInfo.of({
 
 - Updates for published security advisories: pypdf (fills the IRS forms), Pillow, certifi (the certificate authorities BitcoinTX trusts) and opentelemetry-api. ReportLab 5, which draws the reports: they come out the same, and still open no file and fetch nothing.
 - The web pages are built with React 19 and Vite 8: the same screens and figures.
+- Updated the StartOS packaging SDK to 3.1.0.
 
 [Everything in 1.2.10](${CHANGELOG})`,
     es_ES: `BitcoinTX 1.2.10 es una actualización de mantenimiento de la 1.2.9, la versión estable de BitcoinTX 1.x. Corrige cuatro errores que podían falsear una cifra fiscal (abajo, cada uno con a quién pudo afectar y qué hacer), y todos los problemas conocidos que listaba la 1.2.9.
@@ -72,6 +73,7 @@ export const current = VersionInfo.of({
 
 - Actualizaciones por avisos de seguridad publicados: pypdf (rellena los formularios del IRS), Pillow, certifi (las autoridades de certificación en las que confía BitcoinTX) y opentelemetry-api. ReportLab 5, que dibuja los informes: salen iguales, y siguen sin abrir ningún archivo ni descargar nada.
 - Las páginas web se construyen con React 19 y Vite 8: las mismas pantallas y cifras.
+- El SDK de empaquetado de StartOS se ha actualizado a 3.1.0.
 
 [Todo lo de la 1.2.10](${CHANGELOG})`,
     de_DE: `BitcoinTX 1.2.10 ist ein Wartungsupdate von 1.2.9, der stabilen Version von BitcoinTX 1.x. Es behebt vier Fehler, die eine Steuerzahl verfälschen konnten (unten, jeweils mit wen sie betreffen konnten und was zu tun ist), und alle bekannten Probleme, die 1.2.9 aufgeführt hat.
@@ -103,6 +105,7 @@ export const current = VersionInfo.of({
 
 - Updates zu veröffentlichten Sicherheitshinweisen: pypdf (füllt die IRS-Formulare aus), Pillow, certifi (die Zertifizierungsstellen, denen BitcoinTX vertraut) und opentelemetry-api. ReportLab 5, das die Berichte zeichnet: Sie kommen gleich heraus, öffnen weiterhin keine Datei und rufen nichts ab.
 - Die Webseiten werden mit React 19 und Vite 8 gebaut: dieselben Bildschirme und Zahlen.
+- Das StartOS-Paketierungs-SDK wurde auf 3.1.0 aktualisiert.
 
 [Alles in 1.2.10](${CHANGELOG})`,
     pl_PL: `BitcoinTX 1.2.10 to aktualizacja serwisowa wersji 1.2.9, stabilnej wersji BitcoinTX 1.x. Naprawia cztery błędy, które mogły zafałszować wartość podatkową (niżej, przy każdym: kogo mógł dotyczyć i co zrobić), oraz wszystkie znane problemy wymienione w 1.2.9.
@@ -134,6 +137,7 @@ export const current = VersionInfo.of({
 
 - Aktualizacje w związku z opublikowanymi biuletynami bezpieczeństwa: pypdf (wypełnia formularze IRS), Pillow, certifi (urzędy certyfikacji, którym ufa BitcoinTX) i opentelemetry-api. ReportLab 5, który rysuje raporty: wychodzą takie same i nadal nie otwierają żadnego pliku ani niczego nie pobierają.
 - Strony internetowe są budowane z React 19 i Vite 8: te same ekrany i wartości.
+- Zaktualizowano SDK do pakowania StartOS do wersji 3.1.0.
 
 [Wszystko w 1.2.10](${CHANGELOG})`,
     fr_FR: `BitcoinTX 1.2.10 est une mise à jour de maintenance de la 1.2.9, la version stable de BitcoinTX 1.x. Elle corrige quatre bugs qui pouvaient fausser un montant fiscal (ci-dessous, chacun avec qui a pu être touché et que faire), et tous les problèmes connus que listait la 1.2.9.
@@ -165,6 +169,7 @@ export const current = VersionInfo.of({
 
 - Mises à jour liées à des avis de sécurité publiés : pypdf (remplit les formulaires de l’IRS), Pillow, certifi (les autorités de certification auxquelles BitcoinTX fait confiance) et opentelemetry-api. ReportLab 5, qui dessine les rapports : ils sortent identiques, et n’ouvrent toujours aucun fichier ni ne récupèrent rien.
 - Les pages web sont construites avec React 19 et Vite 8 : les mêmes écrans et les mêmes chiffres.
+- Le SDK de création de paquets StartOS a été mis à jour vers la version 3.1.0.
 
 [Tout ce que contient la 1.2.10](${CHANGELOG})`,
   },
