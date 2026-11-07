@@ -31,18 +31,17 @@ as a pull request from DigiMonk73/BTCTX-StartOS. By hand:
 
 - Bump `dockerTag` in `startos/manifest/index.ts` to
   `ghcr.io/digimonk73/btctx-mcp:v<new version>`.
-- Set `version` in `startos/versions/current.ts` to `<new version>:0`, with
-  release notes; move the old `current.ts` to its own file first if its `up`
-  migration does work (see "The package version" below).
+- Bump the package version to `<new version>:0` as Start9's
+  [Versions](https://docs.start9.com/packaging/versions.html) page says, and
+  see "The package version" below for what this package adds.
 
 ## Releasing a new version
 
-Branches (BTCTX-MCP's `AGENTS.md`, "Branches"): work reaches `staging` by
-pull request, and `develop` takes it in a daily merge; `main` holds released
-code only and moves by fast-forwarding to `develop`.
+Branches (BTCTX-MCP's `AGENTS.md`, "Branches"): work reaches `develop` by
+pull request; `main` holds released code only and moves by fast-forwarding
+to `develop`.
 
-1. In a pull request straight into `develop`, like an urgent fix, opened
-   after a daily merge so it carries what `staging` held, bump the version
+1. In a pull request of its own into `develop`, bump the version
    everywhere it is written (the tests fail until all agree; a minor bump
    when a new tax year's forms are added):
    - `VERSION` and the two `CFBundle…Version` values in `desktop/BitcoinTX.spec`
@@ -103,10 +102,10 @@ their fork is the package's upstream for the registry. They change it too:
 template updates about monthly (their `syncNext` workflow keeps a `next`
 branch), SDK bumps and review fixes, by pull requests on their fork.
 
-- **Before each sync, take their changes:** on a branch cut from `staging`,
+- **Before each sync, take their changes:** on a branch cut from `develop`,
   run `scripts/start9-pull.sh` to see what they changed since they last took
   ours, then `scripts/start9-pull.sh --apply`, review, run the checks,
-  commit and open a pull request into `staging`. If what they changed moves
+  commit and open a pull request into `develop`. If what they changed moves
   a sibling in `package-lock.json`, save the bundle's list of sibling
   modules before `--apply` and compare it after ("Bumping the SDK", step 2).
   `--apply` also records their commit in BTCTX-MCP's `scripts/start9-taken`;
@@ -141,20 +140,21 @@ tag `vX.Y.Z-N`: a `## [v0.9.0-1]` CHANGELOG section and a branch
 `release/v0.9.0-1`. The image is reused; the macOS app is rebuilt unchanged.
 
 **Before the community registry serves the current version** (it is only on
-Community Beta, as while the owner tests it there), Start9's rule keeps the
-package version, so a revision isn't allowed (next section), and our release
-workflow can't ship the same version again. Ship the package fix inside a
-small app release instead: a new `VERSION` with a real app fix (never a bump
-with nothing in it), its package version back at `:0`, released as in
+Community Beta, as while the owner tests it there), a revision isn't allowed
+(Start9's Versions page, "A version is released once the reference registry
+serves it"), and our release workflow can't ship the same version again.
+Ship the package fix inside a small app release instead: a new `VERSION`
+with a real app fix (never a bump with nothing in it), its package version
+back at `:0`, released as in
 "Releasing a new version" above, release tests and docs check included
-(owner's rule, 2026-10-17). Its notes cover everything since the version the
-community registry serves. If a package fix can't wait and no app fix is
+(owner's rule, 2026-10-17). If a package fix can't wait and no app fix is
 ready, ask the owner: the rules change then.
 
 **A change Start9's review asks for** on a pull request to their fork, for a
-version the community registry doesn't serve yet, is taken under that same
-version (Start9's `versions.md`; the owner, 2026-10-23, #617): byte-identical
-to their proposal when they give one, in `startos/` by a pull request from a
+version the community registry doesn't serve yet, is taken as Start9's
+Versions page says, under that same version (the owner, 2026-10-23, #617):
+byte-identical to their proposal when they give one, in `startos/` by a pull
+request from a
 branch cut from `main` (the release the mirror holds), and the mirror is synced
 from that branch so the fork's pull request carries only it.
 Our GitHub release keeps the `.s9pk` it shipped; the CHANGELOG says how
@@ -162,48 +162,26 @@ Start9's build of that version differs.
 
 ## The package version
 
-`startos/startos/versions/current.ts` holds `version: '<VERSION>:<revision>'`,
-its release notes (what StartOS shows before updating) and its migration.
+Start9's [Versions](https://docs.start9.com/packaging/versions.html) page is
+the rule for bumping it: when `current.ts` is edited in place and when a
+version file is spun off, migrations, release notes, and when a version
+counts as released. This file doesn't repeat it (Start9's
+`maintaining-a-package.md`, "Chasing upstream"); where the two seem to
+differ, follow the page. What this package adds:
 
-- **New `VERSION`:** if the old `current.ts` has an `up` migration that does
-  real work, first copy it to `vX.Y.Z_N.ts` exporting `v_X_Y_Z_N` (Start9's
-  naming, e.g. `v1.2.0_0.ts` exports `v_1_2_0_0`), add it to `other` in
-  `versions/index.ts`, then write the new `current.ts` with an empty `up`
-  and `down: IMPOSSIBLE`. A migration belongs to the version that
-  introduced it; overwriting it in place would skip it for installs that
-  haven't run it yet. If the old `up` is empty, just edit `current.ts`.
-- **Revision only** (package change, same app, once the community registry
-  serves the current version; below): bump the number after the
-  `:`, moving the old `current.ts` to its own file first in the same way if
-  its `up` does real work (1.2.9:0's did: `v1.2.9_0.ts`), or installs already on it would
-  run it again.
+- The version is `<VERSION>:<revision>`, `<VERSION>` being BTCTX-MCP's root
+  `VERSION` file.
 - `down` is always `IMPOSSIBLE`: an older BitcoinTX refuses a database a newer
   one has migrated.
-- **A version is released once the community registry serves it** (Start9's
-  `versions.md`). Start9's fork and the mirror both name
-  `https://community-registry.start9.com` as `REFERENCE_REGISTRY`; their Tag
-  and Release builds a version again, in place, on every push until that
-  registry serves it (Community Beta doesn't count). Before choosing the
-  version, see which one it serves
-  (`start-cli -r https://community-registry.start9.com registry package get btctx short --format json`,
-  the `best` key), and check the open pull requests on Start9's fork for one
-  that already claims the version. Start9 keeps a package-only follow-up to
-  a version it doesn't serve yet under that version, its notes added to the
-  ones already there; our release workflow can't release a version again, so
-  here such a fix rides in a small app release (above, "Before the community
-  registry serves the current version"), unless Start9's review asks for it
-  (the paragraph after that one).
-- Release notes are user-facing: what changed for them, in plain language,
-  in `en_US`, `es_ES`, `de_DE`, `pl_PL` and `fr_FR`, each ending with the
-  CHANGELOG link. They cover every change since the version the community
-  registry last served: a version that never reached it carries its notes
-  into the next one.
-- Release notes are the only home for what an update asks of the user
-  (Start9's `versions.md`): a step before or after updating, a warning, and
-  with every new `VERSION` the AI connector's new version (`btctx-mcp==` in
-  the AI app's configuration). `instructions.md`, `README.md` and the action
-  messages describe the package as it is, to someone who never ran an older
-  version.
+- The reference registry, `REFERENCE_REGISTRY` on the mirror and on Start9's
+  fork, is `https://community-registry.start9.com`: Community Beta doesn't
+  count. Our release workflow can't release a version again: what that
+  means for a package-only fix is under "After Start9 forks the mirror",
+  above ("Before the community registry serves the current version").
+- Release notes end with the CHANGELOG link. Beside each `tax-figures` fix
+  ("Releasing a new version", step 2), with every new `VERSION` they give
+  the AI connector's new version (`btctx-mcp==` in the AI app's
+  configuration).
 
 Checks: `npm run format:check && rm -rf javascript && make javascript/index.js && node scripts/check-manifest.mjs`
 (`make` type-checks, lints and bundles; from start-sdk 3.1.0 it formats
@@ -213,15 +191,14 @@ instead of checking, so the format check comes first), and `backend/tests/test_v
 
 Start9 moves fast (on 2026-10-23 alone: StartOS 0.4.0.3, start-cli 2.5.0 and
 start-registry 1.2.0), and their reviewers hold the
-package to their current guide and SDK. So BTCTX-MCP watches them daily
-(BTCTX-MCP's `.github/workflows/start9-watch.yml` and `scripts/start9-watch.sh`; the owner,
-2026-10-23; GitHub runs the schedule only from `main`, so until `main`
-carries the workflow, the script is run by hand at the start of each day's
-work: BTCTX-MCP's `AGENTS.md`, "Starting a session"): one issue, labelled `start9`, for each newer start-sdk or
+package to their current guide and SDK. So BTCTX-MCP watches them weekly, on
+Mondays (BTCTX-MCP's `.github/workflows/start9-watch.yml` and `scripts/start9-watch.sh`; the owner,
+2026-10-23, weekly since 2026-10-31. GitHub runs the schedule only from `main`, which ran the
+daily one until 2.0.1's release brought the weekly one there): one issue, labelled `start9`, for each newer start-sdk or
 start-cli than `develop` pins, each StartOS release (test the package on it,
 the lab VM first), each start-registry release (check our start-cli still
-reads the registries), each day Start9's packaging guide or shared package
-workflows change, a failed build on the mirror or their fork, and changes on
+reads the registries), the changes to Start9's packaging guide or shared package
+workflows since the last such issue (one issue listing them), a failed build on the mirror or their fork, and changes on
 their fork not taken back. In BTCTX-MCP, `scripts/start9-watch.sh --dry-run` shows the
 same without opening anything. Each issue says what to do; the Monday report
 lists the open ones.
