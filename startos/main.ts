@@ -1,11 +1,11 @@
-import { T } from '@start9labs/start-sdk'
+import { healthFns } from '@start9labs/start-sdk'
 import { i18n } from './i18n'
 import { currentChoice, priceEnv } from './priceSource'
 import { sdk } from './sdk'
 import { appEnv, mainMounts, uiPort } from './utils'
 
 /** GET /api/health: 200 only when the database answers at the current schema. */
-async function appHealth(): Promise<Omit<T.NamedHealthCheckResult, 'name'>> {
+async function appHealth(): Promise<healthFns.HealthCheckResult> {
   let res: Response
   try {
     res = await fetch(`http://127.0.0.1:${uiPort}/api/health`, {
